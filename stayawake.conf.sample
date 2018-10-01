@@ -1,0 +1,20 @@
+[Settings]
+# The maximum amount of inactivity permitted, in seconds, after which an alarm will sound.
+max-inactivity = 40
+
+# A folder with alarm sounds, from which StayAwake will pick a random file each time.
+# It's best to use shorter alarm sounds instead of long ones so that the sound would stop soon after activity resumes. Use '~' for you home folder on Unix. Use absolute paths to be safe.
+alarm-folder = ~/Music/alarms/
+
+# For Unix with pulseaudio
+volume-max-command = pactl set-sink-mute 0 0 & pactl set-sink-volume 0 100%%
+# For Windows with nircmd
+#volume-max-command = nircmd.exe mutesysvolume 0 & nircmd.exe setsysvolume 65535
+
+# Use an alternate program if you want.
+play-command = mpg123 -q
+
+# Your schedule
+schedule-name = DC2
+schedule = 21:00-00:00 5:00-6:30 12:40-13:00 16:00-16:20
+sleep-names = "Core" "Dawn Core" "Noon Nap" "Afternoon Nap"

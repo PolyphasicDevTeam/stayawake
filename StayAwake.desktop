@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=StayAwake
+Comment=Advanced wake-up alarm system
+GenericName=Alarms
+Exec=/usr/bin/stayawake
+Icon=/usr/share/pixmaps/stayawake.png
+Categories=Utilities;
+Terminal=false
+Type=Application
+Version=0.5.0
