@@ -28,7 +28,7 @@ s = 0
 
 def wakeup():
     soundfile = os.path.join(alarm_dir, random.choice(os.listdir(alarm_dir)))
-    os.system("cvlc --play-and-exit " + soundfile)
+    os.system("cvlc --play-and-exit " + soundfile + " >> /dev/null")
 
 def MouseMonitor():
     def on_move(x, y):
