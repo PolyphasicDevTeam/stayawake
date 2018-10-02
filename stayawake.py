@@ -1,4 +1,4 @@
-import threading, time, argparse, os, configparser, sys, signal, random
+import threading, time, argparse, os, configparser, sys, signal, random, progressbar
 from pynput import *
 
 
@@ -12,8 +12,10 @@ options.parse_args()
 # Load config file
 if options.parse_args().config:
     config.read(os.path.expanduser(options.parse_args().config))
+    print('Using configuration file: ' , os.path.expanduser(options.parse_args().config))
 else:
     config.read(os.path.expanduser('~/.config/stayawake/stayawake.conf'))
+    print('Using default configuration file: ', '~/.config/stayawake/stayawake.conf')
 
 max_inactivity = int(config['Settings']['max-inactivity'])
 alarm_dir = os.path.expanduser(config['Settings']['alarm-folder'])
@@ -70,11 +72,17 @@ threads.append(mouseactivity)
 threads.append(keyboardactivity)
 for thread in threads:
     thread.start()
+
+if not verbose:
+    bar = progressbar.ProgressBar(maxval=max_inactivity, widgets=[progressbar.Bar('=','[',']'), ' ', progressbar.Percentage()])
+    bar.start()
 while 1:
     time.sleep(1)
     s = s + 1
     if verbose:
-        print(str(s)+'s ', end='', flush=True) 
+        print(str(s)+'s ', end='', flush=True)
+    else:
+        bar.update(s)    
     if s > max_inactivity:
         if verbose:
             print('Wake up!!')
