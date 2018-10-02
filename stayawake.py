@@ -1,7 +1,8 @@
+#!/usr/bin/python
 import threading, time, argparse, os, configparser, sys, signal, random, progressbar
 from pynput import *
 
-
+print("Remember to turn the volume up to an unbearably high level!")
 config = configparser.ConfigParser()
 # CLI options
 options = argparse.ArgumentParser(description='The program that helps you stay awake.')
@@ -23,14 +24,23 @@ verbose = options.parse_args().verbose
 
 if verbose:
     print('max-inactivity=', max_inactivity)
-    print('alarm-folder', alarm_dir)
+    print('alarm-folder=', alarm_dir)
 
 # Second counter
 s = 0
 
+#def signal_handler(signal, frame):
+#    for thread in threads:
+#        os.kill(9) 
+#    sys.exit()
+
+def thread_job():
+    time.sleep(5)
+    os.kill(os.getpid(), signal.SIGUSR1)
+
 def wakeup():
     soundfile = os.path.join(alarm_dir, random.choice(os.listdir(alarm_dir)))
-    os.system("cvlc --play-and-exit " + soundfile + " >> /dev/null")
+    os.system("cvlc --play-and-exit " + soundfile)
 
 def MouseMonitor():
     def on_move(x, y):
@@ -64,15 +74,16 @@ def KeyboardMonitor():
         on_release=on_release) as listener:
         listener.join()
 
-
+#signal.signal(signal.SIGINT, signal_handler)
 threads = []
 mouseactivity = threading.Thread(target=MouseMonitor)
 keyboardactivity = threading.Thread(target=KeyboardMonitor)
 threads.append(mouseactivity)
 threads.append(keyboardactivity)
 for thread in threads:
+    thread.daemon = True
     thread.start()
-
+    
 if not verbose:
     bar = progressbar.ProgressBar(maxval=max_inactivity, widgets=[progressbar.Bar('=','[',']'), ' ', progressbar.Percentage()])
     bar.start()
