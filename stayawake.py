@@ -93,7 +93,7 @@ while 1:
     if verbose:
         print(str(s)+'s ', end='', flush=True)
     else:
-        bar.update(s)    
+        bar.update(s-1)    
     if s > max_inactivity:
         if verbose:
             print('Wake up!!')
