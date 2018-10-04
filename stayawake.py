@@ -1,7 +1,8 @@
 #!/usr/bin/python
 import threading, time, argparse, os, configparser, sys, signal, random, progressbar
 from pynput import *
-
+from datetime import datetime
+from playsound import playsound
 print("Remember to turn the volume up to an unbearably high level!")
 config = configparser.ConfigParser()
 # CLI options
@@ -29,18 +30,13 @@ if verbose:
 # Second counter
 s = 0
 
-#def signal_handler(signal, frame):
-#    for thread in threads:
-#        os.kill(9) 
-#    sys.exit()
-
-def thread_job():
-    time.sleep(5)
-    os.kill(os.getpid(), signal.SIGUSR1)
 
 def wakeup():
+    timenow = datetime.now().time()
     soundfile = os.path.join(alarm_dir, random.choice(os.listdir(alarm_dir)))
-    os.system("cvlc --play-and-exit " + soundfile)
+    print("\n", str(timenow), "Wake Up!", "Now Playing ", soundfile)
+    playsound(soundfile)
+    #os.system("cvlc --play-and-exit " + soundfile)
 
 def MouseMonitor():
     def on_move(x, y):
@@ -74,7 +70,6 @@ def KeyboardMonitor():
         on_release=on_release) as listener:
         listener.join()
 
-#signal.signal(signal.SIGINT, signal_handler)
 threads = []
 mouseactivity = threading.Thread(target=MouseMonitor)
 keyboardactivity = threading.Thread(target=KeyboardMonitor)
@@ -98,4 +93,3 @@ while 1:
         if verbose:
             print('Wake up!!')
         wakeup()
-
