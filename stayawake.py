@@ -87,7 +87,7 @@ while 1:
     s = s + 1
     if verbose:
         print(str(s)+'s ', end='', flush=True)
-    if s <= max_inactivity:
+    elif s <= max_inactivity:
         bar.update(s)
     if s > max_inactivity:
         if verbose:
