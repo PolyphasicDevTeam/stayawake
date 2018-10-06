@@ -12,16 +12,25 @@ options.add_argument('-v','--verbose', action='store_true',  help='output more d
 options.parse_args()
 
 # Load config file
-if options.parse_args().config:
-    config.read(os.path.expanduser(options.parse_args().config))
-    print('Using configuration file: ' , os.path.expanduser(options.parse_args().config))
-else:
-    config.read(os.path.expanduser('~/.config/stayawake/stayawake.conf'))
-    print('Using default configuration file: ', '~/.config/stayawake/stayawake.conf')
+max_inactivity = 60 
+alarm_dir = '~/Music/alarms/'
+verbose = False 
 
-max_inactivity = int(config['Settings']['max-inactivity'])
-alarm_dir = os.path.expanduser(config['Settings']['alarm-folder'])
-verbose = options.parse_args().verbose
+
+def configload():
+    if options.parse_args().config:
+        config.read(os.path.expanduser(options.parse_args().config))
+        print('Using configuration file: ' , os.path.expanduser(options.parse_args().config))
+    else:
+        config.read(os.path.expanduser('~/.config/stayawake/stayawake.conf'))
+        print('Using default configuration file: ', '~/.config/stayawake/stayawake.conf')
+    global max_inactivity
+    global alarm_dir
+    global verbose
+    max_inactivity = int(config['Settings']['max-inactivity'])
+    alarm_dir = os.path.expanduser(config['Settings']['alarm-folder'])
+    verbose = options.parse_args().verbose
+
 
 if verbose:
     print('max-inactivity=', max_inactivity)
@@ -70,6 +79,7 @@ def KeyboardMonitor():
         on_release=on_release) as listener:
         listener.join()
 
+configload()
 threads = []
 mouseactivity = threading.Thread(target=MouseMonitor)
 keyboardactivity = threading.Thread(target=KeyboardMonitor)
@@ -87,7 +97,7 @@ while 1:
     s = s + 1
     if verbose:
         print(str(s)+'s ', end='', flush=True)
-    if s <= max_inactivity:
+    elif s <= max_inactivity:
         bar.update(s)
     if s > max_inactivity:
         if verbose:
