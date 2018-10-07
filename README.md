@@ -5,7 +5,7 @@ A command-line utility that helps you stay awake by playing alarms in response t
 Currently, this is just a model of what the future interface will look like. It does not have any features beyond what it looks.
 ### Prerequisites
 Python modules from PyPI: progressbar, argparse, configparse, pynput, playsound
-Modules for stayawake-gtk: gobject
+Modules for stayawake-gtk: pygobject
 
 ### Setup
 Copy `stayawake.conf` to your `~/.config/stayawake/stayawake.conf`. StayAwake will look for the config here unless otherwise specified. <br>
