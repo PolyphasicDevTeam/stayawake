@@ -1,6 +1,10 @@
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk
+from gi.repository import Gtk, GObject, GLib
+import monitor
+import threading
+import time
+from datetime import datetime
 
 class Dashboard(Gtk.Window):
     def __init__(self):
@@ -33,11 +37,11 @@ class Dashboard(Gtk.Window):
 
         status_box = Gtk.ListBox()
         status_label = Gtk.Label(label="Current Time")
-        status_time = Gtk.Label(label="7 October 2018, 09:00")
+        self.status_time = Gtk.Label(label="7 October 2018, 09:00")
         status_sleep_next = Gtk.Label(label="Next Sleep: Nap Noon")
         status_time_remaining = Gtk.Label(label="Time Remaining: 3h 40m")
         status_box.add(status_label)
-        status_box.add(status_time)
+        status_box.add(self.status_time)
         status_box.add(status_sleep_next)
         status_box.add(status_time_remaining)
         status_box.get_row_at_index(0).do_activate(status_box.get_row_at_index(0))
@@ -45,9 +49,10 @@ class Dashboard(Gtk.Window):
         
         activity_box = Gtk.ListBox()
         activity_label = Gtk.Label(label="Activity Monitor")
-        activity_timer_label = Gtk.Label(label="25.7s / 180s")
+        self.activity_timer_label = Gtk.Label()
         monitor_suspend_label = Gtk.Label(label="*Dangerous* Suspend Monitor")
         
+
         suspend_button_box = Gtk.Box()
         suspend_button_5 = Gtk.Button(label="5min")
         suspend_button_15 = Gtk.Button(label="15min")
@@ -58,14 +63,42 @@ class Dashboard(Gtk.Window):
         suspend_button_box.set_halign(Gtk.Align.CENTER)
 
         activity_box.add(activity_label)
-        activity_box.add(activity_timer_label)
+        activity_box.add(self.activity_timer_label)
         activity_box.add(monitor_suspend_label)
         activity_box.add(suspend_button_box)
         activity_box.get_row_at_index(0).do_activate(activity_box.get_row_at_index(0))
         vbox.add(activity_box)
 
+    def clock(self):
+        self.status_time.set_text(str(datetime.now())[:19])
+        self.activity_timer_label.set_text("{:.1f}".format(monitor.s) + 's')
+        print(str(monitor.s))
+        return True
+
+    def start_clock(self):
+        GLib.timeout_add(100, self.clock)
+
+def counter():
+    while 1:
+        monitor.s += 0.1 
+        time.sleep(0.1)
+        
+threads = []
+mouseactivity = threading.Thread(target=monitor.MouseMonitor)
+keyboardactivity = threading.Thread(target=monitor.KeyboardMonitor)
+counter = threading.Thread(target=counter)
+threads.append(mouseactivity)
+threads.append(keyboardactivity)
+threads.append(counter)
+
+for thread in threads:
+    thread.daemon = True
+    thread.start()
+
+
 window = Dashboard()
 window.connect("destroy", Gtk.main_quit)
 window.show_all()
+window.start_clock()
 Gtk.main()
 
