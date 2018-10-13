@@ -10,9 +10,14 @@ options.add_argument('-c','--config', metavar='CONF', help='specify config file'
 options.add_argument('-v','--verbose', action='store_true',  help='output more details')
 options.parse_args()
 verbose = options.parse_args().verbose
+path = ''
+if options.parse_args().config:
+    path = os.path.expanduser(options.parse_args().config)
+    print('Using configuration file: ' , path)
+else:
+    print('Using default configuration file: ', os.path.expanduser('~/.config/stayawake/stayawake.conf'))
 
-
-settings = configload(options, config)
+settings = configload(path, config)
 max_inactivity = settings[0]
 alarm_dir = settings[1]
 volume_max_command = settings[2]

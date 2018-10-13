@@ -1,10 +1,41 @@
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, GObject, GLib
+from gi.repository import Gtk, GObject, GLib, Gdk
 import monitor
 import threading
 import time
+import os
+import configparser
 from datetime import datetime
+from configload import configload
+from wakeup import wakeup
+import argparse
+
+config = configparser.ConfigParser()
+# CLI options
+options = argparse.ArgumentParser(description='The program that helps you stay awake.')
+options.add_argument('-c','--config', metavar='CONF', help='specify config file')
+options.add_argument('-v','--verbose', action='store_true',  help='output more details')
+options.parse_args()
+verbose = options.parse_args().verbose
+path = ''
+if options.parse_args().config:
+    path = os.path.expanduser(options.parse_args().config)
+    print('Using configuration file: ' , path)
+else:
+    print('Using default configuration file: ', os.path.expanduser('~/.config/stayawake/stayawake.conf'))
+
+settings = configload(path, config)
+max_inactivity = settings[0]
+alarm_dir = settings[1]
+volume_max_command = settings[2]
+play_command = settings[3]
+# Settings will be printed out to stdout in verbose mode
+if verbose:
+    print('max-inactivity = ', max_inactivity)
+    print('alarm-folder = ', alarm_dir)
+    print('volume-max-command = ', volume_max_command)
+    print('play-command = ', play_command)
 
 class Dashboard(Gtk.Window):
     def __init__(self):
@@ -72,7 +103,7 @@ class Dashboard(Gtk.Window):
     def clock(self):
         self.status_time.set_text(str(datetime.now())[:19])
         self.activity_timer_label.set_text("{:.1f}".format(monitor.s) + 's')
-        print(str(monitor.s))
+        #print(str(monitor.s))
         return True
 
     def start_clock(self):
@@ -82,21 +113,36 @@ def counter():
     while 1:
         monitor.s += 0.1 
         time.sleep(0.1)
+
+window = Dashboard()
         
+def main():
+    while 1:
+        if monitor.s >= max_inactivity:
+            window.activity_timer_label.override_background_color(0, Gdk.RGBA(red=1.0, green=0.0, blue=0.0, alpha=1.0))
+            window.activity_timer_label.override_color(0, Gdk.RGBA(red=1.0, green=1.0, blue=1.0, alpha=1.0))
+            wakeup(alarm_dir, volume_max_command, play_command)
+        if monitor.s < max_inactivity:
+            print('Activity resumes')
+            window.activity_timer_label.override_background_color(0, Gdk.RGBA(red=1.0, green=1.0, blue=1.0, alpha=1.0))
+            window.activity_timer_label.override_color(0, None) 
+        time.sleep(1)
+            
 threads = []
 mouseactivity = threading.Thread(target=monitor.MouseMonitor)
 keyboardactivity = threading.Thread(target=monitor.KeyboardMonitor)
 counter = threading.Thread(target=counter)
+main = threading.Thread(target=main)
 threads.append(mouseactivity)
 threads.append(keyboardactivity)
 threads.append(counter)
+threads.append(main)
 
 for thread in threads:
     thread.daemon = True
     thread.start()
 
 
-window = Dashboard()
 window.connect("destroy", Gtk.main_quit)
 window.show_all()
 window.start_clock()
