@@ -123,7 +123,7 @@ def main():
             window.activity_timer_label.override_color(0, Gdk.RGBA(red=1.0, green=1.0, blue=1.0, alpha=1.0))
             wakeup(alarm_dir, volume_max_command, play_command)
         if monitor.s < max_inactivity:
-            print('Activity resumes')
+            print('Activity Resumes')
             window.activity_timer_label.override_background_color(0, Gdk.RGBA(red=1.0, green=1.0, blue=1.0, alpha=1.0))
             window.activity_timer_label.override_color(0, None) 
         time.sleep(1)

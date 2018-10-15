@@ -1,0 +1,4 @@
+pygobject
+configparser
+progressbar
+playsound

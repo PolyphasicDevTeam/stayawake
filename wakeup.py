@@ -9,5 +9,5 @@ def wakeup(alarm_dir, volume_max_command, play_command):
     if play_command != '':
         os.system(play_command + ' ' + soundfile)
     else:
-        playsound(soundfile)
+        playsound.playsound(soundfile)
 

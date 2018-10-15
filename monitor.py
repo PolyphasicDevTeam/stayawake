@@ -1,10 +1,10 @@
 from pynput import *
 s = 0
 def MouseMonitor():
-    def on_move(x, y):
-        global s
-        s = 0
-        #print('Pointer moved to {0}'.format((x, y)))
+#    def on_move(x, y):
+#        global s
+#        s = 0
+#        #print('Pointer moved to {0}'.format((x, y)))
         
 
     def on_click(x, y, button, pressed):
@@ -13,7 +13,7 @@ def MouseMonitor():
         #print('{0} at {1}'.format('Pressed' if pressed else 'Released',(x, y)))
 
     with mouse.Listener(
-        on_move=on_move,
+        #on_move=on_move,
         on_click=on_click) as listener:
         listener.join()
 
