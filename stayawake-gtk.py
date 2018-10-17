@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GObject, GLib, Gdk
@@ -10,6 +11,8 @@ from datetime import datetime
 from configload import configload
 from wakeup import wakeup
 import argparse
+import sleepnext
+import shlex
 
 config = configparser.ConfigParser()
 # CLI options
@@ -30,6 +33,23 @@ max_inactivity = settings[0]
 alarm_dir = settings[1]
 volume_max_command = settings[2]
 play_command = settings[3]
+schedule_name = settings[4]
+schedule = settings[5]
+schedule = schedule.split()
+schedule_pretty = ''
+for i in range(0,len(schedule)):
+    schedule[i] = schedule[i].split('-')
+print(schedule)
+for i in range(0,len(schedule)):
+    schedule_pretty += schedule[i][0]
+    schedule_pretty += '-'
+    schedule_pretty += schedule[i][1]
+    schedule_pretty += ' '
+#print(len(schedule))
+sleep_names = settings[6]
+sleep_names = shlex.split(sleep_names)
+print(sleep_names)
+
 # Settings will be printed out to stdout in verbose mode
 if verbose:
     print('max-inactivity = ', max_inactivity)
@@ -53,13 +73,20 @@ class Dashboard(Gtk.Window):
         config_label = Gtk.Label(label="Configuration file path:")
         config_path_entry = Gtk.Entry()
         config_path_entry.set_text("~/.config/stayawake/stayawake.conf")
+        config_button = Gtk.Button(label="Use")
+        config_box = Gtk.Box()
+        config_box.pack_start(config_path_entry, True, True, 0)
+        config_box.pack_end(config_button, False, False, 10)
         vbox.add(config_label)
-        vbox.add(config_path_entry)
+        vbox.add(config_box)
 
+        global schedule_name
+        global schedule
+        global schedule_pretty
         schedule_box = Gtk.ListBox()
         schedule_label = Gtk.Label(label="Current Schedule")
-        schedule_name = Gtk.Label(label="E2-shortened")
-        schedule_times = Gtk.Label(label="21:30-01:00 05:00-05:20 12:50-13:10")
+        schedule_name = Gtk.Label(label=schedule_name)
+        schedule_times = Gtk.Label(label=schedule_pretty)
         schedule_box.add(schedule_label)
         schedule_box.add(schedule_name)
         schedule_box.add(schedule_times) 
@@ -68,13 +95,13 @@ class Dashboard(Gtk.Window):
 
         status_box = Gtk.ListBox()
         status_label = Gtk.Label(label="Current Time")
-        self.status_time = Gtk.Label(label="7 October 2018, 09:00")
-        status_sleep_next = Gtk.Label(label="Next Sleep: Nap Noon")
-        status_time_remaining = Gtk.Label(label="Time Remaining: 3h 40m")
+        self.status_time = Gtk.Label()
+        self.status_sleep_next = Gtk.Label()
+        self.status_time_remaining = Gtk.Label()
         status_box.add(status_label)
         status_box.add(self.status_time)
-        status_box.add(status_sleep_next)
-        status_box.add(status_time_remaining)
+        status_box.add(self.status_sleep_next)
+        status_box.add(self.status_time_remaining)
         status_box.get_row_at_index(0).do_activate(status_box.get_row_at_index(0))
         vbox.add(status_box)
         
@@ -103,7 +130,8 @@ class Dashboard(Gtk.Window):
     def clock(self):
         self.status_time.set_text(str(datetime.now())[:19])
         self.activity_timer_label.set_text("{:.1f}".format(monitor.s) + 's')
-        #print(str(monitor.s))
+        self.status_sleep_next.set_text('Next Sleep: ' + sleepnext.next(schedule, sleep_names))
+        self.status_time_remaining.set_text(sleepnext.time_remaining(schedule) + ' remaining')
         return True
 
     def start_clock(self):
@@ -123,8 +151,8 @@ def main():
             window.activity_timer_label.override_color(0, Gdk.RGBA(red=1.0, green=1.0, blue=1.0, alpha=1.0))
             wakeup(alarm_dir, volume_max_command, play_command)
         if monitor.s < max_inactivity:
-            print('Activity Resumes')
-            window.activity_timer_label.override_background_color(0, Gdk.RGBA(red=1.0, green=1.0, blue=1.0, alpha=1.0))
+            #print('Activity Resumes')
+            window.activity_timer_label.override_background_color(0, None)
             window.activity_timer_label.override_color(0, None) 
         time.sleep(1)
             
