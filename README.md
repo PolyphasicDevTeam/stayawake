@@ -5,11 +5,11 @@ A command-line utility that helps you stay awake by playing alarms in response t
 - Play alarms in response to inactivity
 - Auto-adjust volume for playing alarms
 - Log each lapse in alertness
+- Schedule dashboard
 
 ### Planned Features
 - Monitor suspend
 - Time block config
-- Schedule dashboard
 
 ### Prerequisites
 Python modules: progressbar, argparse, configparse, pynput, playsound, pygobject
@@ -26,13 +26,12 @@ You can select files from [this](https://www.dropbox.com/s/dihn9m58wfnyxwk/alarm
 
 ### Todo
 #### Near future
-- schedule configuration
 - GTK+ config helper
 - suspend feature
-- time blocks
+- time blocks for monitoring
 #### Intermediate future
-- Schedule dashboard/statistics
+- Schedule statistics
 - Discord integration
 #### And the beyond
-- Central server
+- Web integration
 - Qt interface
