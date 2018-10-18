@@ -7,6 +7,9 @@ def MouseMonitor():
 #        #print('Pointer moved to {0}'.format((x, y)))
         
 
+    def on_scroll(x, y, dx, dy):
+        global s
+        s = 0
     def on_click(x, y, button, pressed):
         global s
         s = 0
@@ -14,8 +17,9 @@ def MouseMonitor():
 
     with mouse.Listener(
         #on_move=on_move,
-        on_click=on_click) as listener:
-        listener.join()
+        on_click=on_click,
+        on_scroll=on_scroll) as listener:
+            listener.join()
 
 def KeyboardMonitor():
     def on_press(key):
