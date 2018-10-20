@@ -1,3 +1,4 @@
+pynput
 pygobject
 configparser
 progressbar

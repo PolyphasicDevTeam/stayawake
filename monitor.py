@@ -1,5 +1,7 @@
+from multiprocessing import Value
+from ctypes import c_double
 from pynput import *
-s = 0
+s = Value(c_double, 0.0)
 def MouseMonitor():
 #    def on_move(x, y):
 #        global s
@@ -7,9 +9,15 @@ def MouseMonitor():
 #        #print('Pointer moved to {0}'.format((x, y)))
         
 
+<<<<<<< Updated upstream
+=======
+    def on_scroll(x, y, dx, dy):
+        global s
+        s.value = 0
+>>>>>>> Stashed changes
     def on_click(x, y, button, pressed):
         global s
-        s = 0
+        s.value = 0
         #print('{0} at {1}'.format('Pressed' if pressed else 'Released',(x, y)))
 
     with mouse.Listener(
@@ -20,12 +28,12 @@ def MouseMonitor():
 def KeyboardMonitor():
     def on_press(key):
         global s
-        s = 0
+        s.value = 0
         #print('Key pressed.')
 
     def on_release(key):
         global s
-        s = 0
+        s.value = 0
         #print('Key released.')
     with keyboard.Listener(
         on_press=on_press,

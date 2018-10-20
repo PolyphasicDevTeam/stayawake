@@ -1,5 +1,6 @@
 import os, configparser
-def configload(path, config):
+def configload(path):
+    config = configparser.ConfigParser()
     if path:
         config.read(path)
     else:
