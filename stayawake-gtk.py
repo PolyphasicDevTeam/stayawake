@@ -6,6 +6,7 @@ import monitor
 import threading 
 import time
 import os
+import sys
 import configparser
 import datetime
 from configload import configload
@@ -24,9 +25,15 @@ path = ''
 if options.parse_args().config:
     path = os.path.expanduser(options.parse_args().config)
     print('Using configuration file: ' , path)
-else:
+elif os.path.isfile('stayawake.conf'):
+    path = 'stayawake.conf'
+    print('Using configuration file: ', path)
+elif os.path.isfile(os.path.expandvars('$HOME/.config/stayawake/stayawake.conf')):
     path = os.path.expanduser('~/.config/stayawake/stayawake.conf')
-    print('Using default configuration file: ', path)
+    print('Using configuration file: ', path)
+else:
+    print('Configuration file not found.\nIt should be named "stayawake.conf" in the same directory as the executable or in $HOME/.config/stayawake/ (Unix only)')
+    sys.exit()
 
 settings = configload(path)
 max_inactivity = datetime.timedelta(seconds=settings[0])
@@ -45,7 +52,6 @@ for i in range(0,len(schedule)):
     schedule_pretty += '-'
     schedule_pretty += schedule[i][1]
     schedule_pretty += ' '
-#print(len(schedule))
 sleep_names = settings[6]
 sleep_names = shlex.split(sleep_names)
 print(sleep_names)
@@ -56,6 +62,8 @@ if verbose:
     print('alarm-folder = ', alarm_dir)
     print('volume-max-command = ', volume_max_command)
     print('play-command = ', play_command)
+    print('schedule = ', schedule)
+    print('sleep-names = ', sleep_names)
 
 class Dashboard(Gtk.Window):
     def __init__(self):
@@ -70,15 +78,8 @@ class Dashboard(Gtk.Window):
         title.set_markup("<span font_size='30720'>StayAwake</span>")
         vbox.add(title)
                 
-        config_label = Gtk.Label(label="Using config:")
-        config_path_label = Gtk.Label()
-        config_path_label.set_text(path)
-        config_button = Gtk.Button(label="Use")
-        #config_box = Gtk.Box()
-        #config_box.pack_start(config_path_label, True, True, 0)
-        #config_box.pack_end(config_button, False, False, 10)
+        config_label = Gtk.Label(label="Using:  " + path)
         vbox.add(config_label)
-        vbox.add(config_path_label)
 
         global schedule_name
         global schedule
@@ -112,26 +113,41 @@ class Dashboard(Gtk.Window):
         
 
         suspend_button_box = Gtk.Box()
-        suspend_button_5 = Gtk.Button(label="5min")
-        suspend_button_15 = Gtk.Button(label="15min")
-        suspend_button_30 = Gtk.Button(label="30min")
-        suspend_button_box.add(suspend_button_5)
-        suspend_button_box.add(suspend_button_15)
-        suspend_button_box.add(suspend_button_30)
+        self.suspend_spin_button = Gtk.SpinButton()
+        suspend_adjustment = Gtk.Adjustment(value=0, lower=0, upper=720, step_increment=1)
+        self.suspend_spin_button.set_adjustment(suspend_adjustment)
+        self.suspend_spin_button.set_numeric(True)
+        suspend_label = Gtk.Label()
+        suspend_label.set_text(' minutes ')
+        suspend_apply = Gtk.Button.new_with_mnemonic('_Apply')
+        suspend_apply.connect("clicked", self.on_suspend)
+        suspend_cancel = Gtk.Button.new_with_mnemonic('_Cancel')
+        suspend_cancel.connect("clicked", self.on_cancel)
+        suspend_button_box.add(self.suspend_spin_button)
+        suspend_button_box.add(suspend_label)
+        suspend_button_box.add(suspend_apply)
+        suspend_button_box.add(suspend_cancel)
         suspend_button_box.set_halign(Gtk.Align.CENTER)
 
         activity_box.add(activity_label)
         activity_box.add(self.activity_timer_label)
-        #activity_box.add(suspend_label)
-        #activity_box.add(suspend_button_box)
+        activity_box.add(suspend_button_box)
         activity_box.get_row_at_index(0).do_activate(activity_box.get_row_at_index(0))
         vbox.add(activity_box)
 
+    def on_suspend(self, button):
+        monitor.la += datetime.timedelta(minutes=self.suspend_spin_button.get_value_as_int()) 
+        self.activity_timer_label.set_text('The monitor will resume at: ' + str(monitor.la)[:19])
+
+    def on_cancel(self, button):
+        monitor.la = datetime.datetime.now() - datetime.timedelta(seconds=1)
+         
     def clock(self):
         now = datetime.datetime.now()
         diff = now - monitor.la
         self.status_time.set_text(str(now)[:19])
-        self.activity_timer_label.set_text(str(diff.seconds) + '.' + str(diff.microseconds)[:1] + 's / ' + str(max_inactivity.seconds) + 's')
+        if monitor.la < now:
+            self.activity_timer_label.set_text(str(diff.seconds) + '.' + str(diff.microseconds)[:1] + 's / ' + str(max_inactivity.seconds) + 's')
         self.status_sleep_next.set_text('Next Sleep: ' + sleepnext.next(schedule, sleep_names))
         self.status_time_remaining.set_text(sleepnext.time_remaining(schedule) + ' remaining')
         return True
