@@ -1,11 +1,10 @@
 import subprocess, os, playsound, random
-from multiprocessing import Process
+from threading import Thread
 from datetime import datetime
 import signal
-class Waker(Process):
+class Waker(Thread):
     def __init__(self, alarm_dir, volume_max_command, play_command):
         super().__init__(target=self.wakeup, args=(alarm_dir, volume_max_command, play_command))
-        signal.signal(signal.SIGTERM, self.exit)
         self.dir = alarm_dir
         self.vup = volume_max_command 
         self.pcd = play_command
@@ -15,16 +14,11 @@ class Waker(Process):
         timenow = datetime.now().time()
         print('[' + str(timenow)[:8] + ']', "Wake Up!", "Now Playing ", self.file)
         if self.vup != '':
-            p = Process(target=subprocess.run, args=(self.vup,))
-            p.daemon = True
-            #p.start()
-            print('volume maximised')
+            os.system(self.vup)
         command = self.pcd + ' ' + self.file
         command = command.split()
         print(command)
         self.c = subprocess.Popen(command)
-        print(self.pid)
 
-        print('playing')
     def exit(self):
         os.kill(self.c.pid, signal.SIGTERM)

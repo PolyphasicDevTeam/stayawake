@@ -3,11 +3,11 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GObject, GLib, Gdk
 import monitor
-import multiprocessing 
+import threading 
 import time
 import os
 import configparser
-from datetime import datetime
+import datetime
 from configload import configload
 from wakeup import Waker
 import argparse
@@ -25,10 +25,11 @@ if options.parse_args().config:
     path = os.path.expanduser(options.parse_args().config)
     print('Using configuration file: ' , path)
 else:
-    print('Using default configuration file: ', os.path.expanduser('~/.config/stayawake/stayawake.conf'))
+    path = os.path.expanduser('~/.config/stayawake/stayawake.conf')
+    print('Using default configuration file: ', path)
 
 settings = configload(path)
-max_inactivity = settings[0]
+max_inactivity = datetime.timedelta(seconds=settings[0])
 alarm_dir = settings[1]
 volume_max_command = settings[2]
 play_command = settings[3]
@@ -67,17 +68,17 @@ class Dashboard(Gtk.Window):
         
         title = Gtk.Label()
         title.set_markup("<span font_size='30720'>StayAwake</span>")
-        #vbox.add(title)
+        vbox.add(title)
                 
-        config_label = Gtk.Label(label="Configuration file path:")
-        config_path_entry = Gtk.Entry()
-        config_path_entry.set_text("~/.config/stayawake/stayawake.conf")
+        config_label = Gtk.Label(label="Using config:")
+        config_path_label = Gtk.Label()
+        config_path_label.set_text(path)
         config_button = Gtk.Button(label="Use")
-        config_box = Gtk.Box()
-        config_box.pack_start(config_path_entry, True, True, 0)
-        config_box.pack_end(config_button, False, False, 10)
+        #config_box = Gtk.Box()
+        #config_box.pack_start(config_path_label, True, True, 0)
+        #config_box.pack_end(config_button, False, False, 10)
         vbox.add(config_label)
-        vbox.add(config_box)
+        vbox.add(config_path_label)
 
         global schedule_name
         global schedule
@@ -107,7 +108,7 @@ class Dashboard(Gtk.Window):
         activity_box = Gtk.ListBox()
         activity_label = Gtk.Label(label="Activity Monitor")
         self.activity_timer_label = Gtk.Label()
-        monitor.s.valueuspend_label = Gtk.Label(label="*Dangerous* Suspend Monitor")
+        suspend_label = Gtk.Label(label="*Dangerous* Suspend Monitor")
         
 
         suspend_button_box = Gtk.Box()
@@ -121,14 +122,16 @@ class Dashboard(Gtk.Window):
 
         activity_box.add(activity_label)
         activity_box.add(self.activity_timer_label)
-        activity_box.add(monitor.s.valueuspend_label)
-        activity_box.add(suspend_button_box)
+        #activity_box.add(suspend_label)
+        #activity_box.add(suspend_button_box)
         activity_box.get_row_at_index(0).do_activate(activity_box.get_row_at_index(0))
         vbox.add(activity_box)
 
     def clock(self):
-        self.status_time.set_text(str(datetime.now())[:19])
-        self.activity_timer_label.set_text("{:.1f}".format(monitor.s.value) + 's')
+        now = datetime.datetime.now()
+        diff = now - monitor.la
+        self.status_time.set_text(str(now)[:19])
+        self.activity_timer_label.set_text(str(diff.seconds) + '.' + str(diff.microseconds)[:1] + 's / ' + str(max_inactivity.seconds) + 's')
         self.status_sleep_next.set_text('Next Sleep: ' + sleepnext.next(schedule, sleep_names))
         self.status_time_remaining.set_text(sleepnext.time_remaining(schedule) + ' remaining')
         return True
@@ -136,54 +139,41 @@ class Dashboard(Gtk.Window):
     def start_clock(self):
         GLib.timeout_add(100, self.clock)
 
-def counter():
-    while 1:
-        monitor.s.value += 0.1 
-        time.sleep(0.1)
-        print(monitor.s.value)
 window = Dashboard()
         
 def main():
     lw = []
     while 1:
-        if monitor.s.value >= max_inactivity:
+        diff = datetime.datetime.now() - monitor.la
+        if diff >= max_inactivity:
             window.activity_timer_label.override_background_color(0, Gdk.RGBA(red=1.0, green=0.0, blue=0.0, alpha=1.0))
             window.activity_timer_label.override_color(0, Gdk.RGBA(red=1.0, green=1.0, blue=1.0, alpha=1.0))
             w = Waker(alarm_dir, volume_max_command, play_command)
             lw.append(w)
             w.wakeup()
-        if monitor.s.value < max_inactivity:
-            print('activity detected...')
-            #try:
+        if diff < max_inactivity:
             for wa in lw:
                 if wa:
                     wa.exit()
-                    print('trying to terminate')
-           #except AttributeError:
-            #print('uwu')
-           #except NameError:
-            #print('uwu')
             window.activity_timer_label.override_background_color(0, None)
             window.activity_timer_label.override_color(0, None) 
         time.sleep(1)
             
-procs = []
-mouseactivity = multiprocessing.Process(target=monitor.MouseMonitor)
-keyboardactivity = multiprocessing.Process(target=monitor.KeyboardMonitor)
-counter = multiprocessing.Process(target=counter)
-main = multiprocessing.Process(target=main)
-procs.append(mouseactivity)
-procs.append(keyboardactivity)
-procs.append(counter)
-procs.append(main)
-counter.daemon = True
+t = []
+mouseactivity = threading.Thread(target=monitor.MouseMonitor)
+keyboardactivity = threading.Thread(target=monitor.KeyboardMonitor)
+main = threading.Thread(target=main)
+t.append(mouseactivity)
+t.append(keyboardactivity)
+t.append(main)
 mouseactivity.daemon = True 
 keyboardactivity.daemon = True
-for proc in procs:
-    proc.start()
+for thread in t:
+    thread.daemon = True
+    thread.start()
 
 
-#window.connect("destroy", Gtk.main_quit)
+window.connect("destroy", Gtk.main_quit)
 window.show_all()
 window.start_clock()
 Gtk.main()

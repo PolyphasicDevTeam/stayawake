@@ -1,7 +1,6 @@
-from multiprocessing import Value
-from ctypes import c_double
 from pynput import *
-s = Value(c_double, 0.0)
+import datetime
+la = datetime.datetime.now() 
 def MouseMonitor():
 #    def on_move(x, y):
 #        global s
@@ -10,28 +9,30 @@ def MouseMonitor():
         
 
     def on_scroll(x, y, dx, dy):
-        global s
-        s.value = 0
+        global la 
+        if la < datetime.datetime.now():
+            la = datetime.datetime.now() 
     def on_click(x, y, button, pressed):
-        global s
-        s.value = 0
-        #print('{0} at {1}'.format('Pressed' if pressed else 'Released',(x, y)))
+        global la 
+        if la < datetime.datetime.now():
+            la = datetime.datetime.now() 
 
     with mouse.Listener(
         #on_move=on_move,
-        on_click=on_click) as listener:
+        on_click=on_click,
+        on_scroll=on_scroll) as listener:
         listener.join()
 
 def KeyboardMonitor():
     def on_press(key):
-        global s
-        s.value = 0
-        #print('Key pressed.')
+        global la 
+        if la < datetime.datetime.now():
+            la = datetime.datetime.now() 
 
     def on_release(key):
-        global s
-        s.value = 0
-        #print('Key released.')
+        global la 
+        if la < datetime.datetime.now():
+            la = datetime.datetime.now() 
     with keyboard.Listener(
         on_press=on_press,
         on_release=on_release) as listener:
