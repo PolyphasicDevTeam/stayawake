@@ -12,7 +12,7 @@ A command-line utility that helps you stay awake by playing alarms in response t
 - Time block config
 
 ### Prerequisites
-Python modules: progressbar, argparse, configparse, pynput, playsound, pygobject
+Python modules: progressbar, argparse, configparse, pynput, pygobject
 `pulseaudio` is required for auto-adjusting volume on Linux.
 `mpg123` will be used as the preferred player, with fallback being `playsound` python module.
 ### Setup
