@@ -19,20 +19,12 @@ class Waker(Process):
             p.daemon = True
             #p.start()
             print('volume maximised')
-        if self.pcd != '':
-            command = self.pcd + ' ' + self.file
-            command = command.split()
-            print(command)
-            self.c = subprocess.Popen(command)
-            print(self.c.pid)
-            print('playing')
-        else:
-            p = Process(target=playsound.playsound, args=(self.file,))
-            p.daemon = True
-            p.start()
-            print('playing')
-            p.join()
+        command = self.pcd + ' ' + self.file
+        command = command.split()
+        print(command)
+        self.c = subprocess.Popen(command)
+        print(self.pid)
+
+        print('playing')
     def exit(self):
-            self.c.kill()
-            super().terminate() 
-    
+        os.kill(self.c.pid, signal.SIGTERM)

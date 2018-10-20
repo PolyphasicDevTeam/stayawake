@@ -9,12 +9,9 @@ def MouseMonitor():
 #        #print('Pointer moved to {0}'.format((x, y)))
         
 
-<<<<<<< Updated upstream
-=======
     def on_scroll(x, y, dx, dy):
         global s
         s.value = 0
->>>>>>> Stashed changes
     def on_click(x, y, button, pressed):
         global s
         s.value = 0
