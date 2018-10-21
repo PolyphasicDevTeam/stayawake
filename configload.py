@@ -1,10 +1,7 @@
 import os, configparser
 def configload(path):
     config = configparser.ConfigParser()
-    if path:
-        config.read(path)
-    else:
-        config.read(os.path.expanduser('~/.config/stayawake/stayawake.conf'))
+    config.read(path)
     max_inactivity = int(config['Settings']['max-inactivity'])
     alarm_dir = os.path.expanduser(config['Settings']['alarm-folder'])
     volume_max_command = config['Settings']['volume-max-command'] 

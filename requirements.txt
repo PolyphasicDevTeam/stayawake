@@ -1,5 +1,2 @@
 pynput
 pygobject
-configparser
-progressbar
-playsound
