@@ -18,7 +18,7 @@ Python modules: pynput, pygobject
 `mpg123` is the default player.
 
 ### Setup
-Clone the repo, use either pip or your distro's package manager to install the dependencies, and run `./stayawake.py`.
+Clone the repo, use either pip or your distro's package manager to install the dependencies, and run `./stayawake-gtk.py`.
 Copy `stayawake.conf.sample` to your `~/.config/stayawake/stayawake.conf`. StayAwake will look for the config here unless there is a file name `stayawake.conf in the same directory as the executable or another file is specified with CLI options.  
 
 Windows:  
