@@ -9,9 +9,14 @@ def MouseMonitor():
         
 
     def on_scroll(x, y, dx, dy):
+<<<<<<< HEAD
         global la 
         if la < datetime.datetime.now():
             la = datetime.datetime.now() 
+=======
+        global s
+        s = 0
+>>>>>>> master
     def on_click(x, y, button, pressed):
         global la 
         if la < datetime.datetime.now():
@@ -21,7 +26,11 @@ def MouseMonitor():
         #on_move=on_move,
         on_click=on_click,
         on_scroll=on_scroll) as listener:
+<<<<<<< HEAD
         listener.join()
+=======
+            listener.join()
+>>>>>>> master
 
 def KeyboardMonitor():
     def on_press(key):

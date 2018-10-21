@@ -21,8 +21,8 @@ def time_remaining(schedule):
             next_sleep[i] += datetime.timedelta(days=1)
     ns = min(next_sleep, key=lambda x: x - now)
     remaining = (ns - now).seconds
-    hours = floor(remaining/3600)
-    minutes = floor(remaining / 60) - 60 * hours
+    hours = remaining // 3600
+    minutes = remaining // 60 - 60 * hours
     seconds = floor(remaining) - 60 * minutes - 3600 * hours
     timefmt = str(hours) + ':' + str(minutes).zfill(2) + ':' + str(seconds).zfill(2)
     return timefmt 
