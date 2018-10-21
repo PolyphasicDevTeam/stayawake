@@ -19,7 +19,7 @@ Python modules: `pynput`, `pygobject`
 
 ### Setup
 Clone the repo, use either pip or your distro's package manager to install the dependencies, and run `./stayawake-gtk.py`.
-Copy `stayawake.conf.sample` to your `~/.config/stayawake/stayawake.conf` and edit the file. StayAwake will look for the config here unless there is a file name `stayawake.conf in the same directory as the executable or another file is specified with CLI options.  
+Copy `stayawake.conf.sample` to your `~/.config/stayawake/stayawake.conf` and edit the file. StayAwake will look for the config here unless there is a file named `stayawake.conf` in the same directory as the executable or another file is specified with CLI options.  
 
 Windows:  
 Windows is not officially supported. However, it might work under MinGW. For instructions over how to install PyGObject on Windows, see [this](https://pygobject.readthedocs.io/en/latest/getting_started.html#windows-getting-started)
