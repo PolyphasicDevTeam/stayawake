@@ -1,4 +1,4 @@
-import subprocess, os, playsound, random
+import subprocess, os, random
 from threading import Thread
 from datetime import datetime
 import signal
