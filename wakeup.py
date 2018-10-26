@@ -8,17 +8,29 @@ class Waker(Thread):
         self.dir = alarm_dir
         self.vup = volume_max_command 
         self.pcd = play_command
-        self.file = os.path.join(self.dir, random.choice(os.listdir(self.dir)))
+        self.file = None
         self.c = None
+        self.first = True
     def wakeup(self):
         timenow = datetime.now().time()
-        print('[' + str(timenow)[:8] + ']', "Wake Up!", "Now Playing ", self.file)
+        message = '[' + str(timenow)[:8] + ']' + "Wake Up!"\
+            + "Now Playing " + os.path.join(
+            self.dir, random.choice(os.listdir(self.dir)))
         if self.vup != '':
             os.system(self.vup)
+        self.file = os.path.join(self.dir, random.choice(os.listdir(self.dir)))
         command = self.pcd + ' ' + self.file
         command = command.split()
-        print(command)
-        self.c = subprocess.Popen(command)
+        if self.first is True:
+            print(command)
+            self.first = False
+            print(message)
+            self.c = subprocess.Popen(command)
+        if self.c.poll() is not None:
+            print(command)
+            print(message)
+            self.c = subprocess.Popen(command)
 
     def exit(self):
-        os.kill(self.c.pid, signal.SIGTERM)
+        if self.c:
+            os.kill(self.c.pid, signal.SIGTERM)

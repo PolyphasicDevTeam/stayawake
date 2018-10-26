@@ -184,7 +184,8 @@ window = Dashboard()
 
 
 def main():
-    lw = []
+    w = Waker(alarm_dir, volume_max_command, play_command)
+
     while 1:
         diff = datetime.datetime.now() - monitor.la
         if diff >= max_inactivity:
@@ -194,13 +195,9 @@ def main():
             window.activity_timer_label.override_color(0,
                 Gdk.RGBA(red=1.0, green=1.0, blue=1.0, alpha=1.0))
             # Alarm playing
-            w = Waker(alarm_dir, volume_max_command, play_command)
-            lw.append(w)
             w.wakeup()
         if diff < max_inactivity:
-            for wa in lw:
-                if wa:
-                    wa.exit()
+            w.exit()
             window.activity_timer_label.override_background_color(0, None)
             window.activity_timer_label.override_color(0, None)
         time.sleep(1)
