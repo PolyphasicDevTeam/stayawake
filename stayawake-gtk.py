@@ -26,6 +26,7 @@ options.add_argument('-c','--config',
 options.add_argument('-v','--verbose', action='store_true',
                      help='output more details')
 options.parse_args()
+print('Started ' + str(datetime.datetime.now()))
 verbose = options.parse_args().verbose
 path = ''
 if options.parse_args().config:
