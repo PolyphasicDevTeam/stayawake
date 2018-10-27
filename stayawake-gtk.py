@@ -82,6 +82,7 @@ class Dashboard(Gtk.Window):
         vbox.set_margin_top(20)
         vbox.set_margin_start(40)
         vbox.set_margin_end(40)
+        vbox.set_margin_bottom(40)
 
         title = Gtk.Label()
         title.set_markup("<span font_size='30720'>StayAwake</span>")
@@ -139,6 +140,7 @@ class Dashboard(Gtk.Window):
         suspend_spinbutton_box.set_halign(Gtk.Align.CENTER)
 
         suspend_button_box = Gtk.Box()
+        suspend_button_box.set_spacing(20)
         suspend_button_box.add(suspend_cancel)
         suspend_button_box.add(suspend_apply)
         suspend_button_box.set_halign(Gtk.Align.CENTER)
@@ -157,11 +159,19 @@ class Dashboard(Gtk.Window):
             minutes=self.suspend_spin_button.get_value_as_int())
         self.activity_timer_label.set_text('The monitor will resume at: '
             + str(monitor.la)[:19])
+        if self.suspend_spin_button.get_value_as_int() is not 0:
+            print('[' + str(datetime.datetime.now().time())[:8] + ']'\
+                + ' Monitor suspended for '
+                + str(self.suspend_spin_button.get_value_as_int())
+                + ' minutes until '
+                + str(monitor.la)[:19])
         self.suspend_spin_button.set_value(0)
 
     def on_cancel(self, button):
         self.suspend_spin_button.set_value(0)
         monitor.la = datetime.datetime.now()
+        print(('[' + str(datetime.datetime.now().time())[:8] + ']'\
+                + ' Monitor suspension is reset, now resuming.'))
 
     def clock(self):
         now = datetime.datetime.now()
