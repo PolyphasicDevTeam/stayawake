@@ -171,7 +171,7 @@ class Dashboard(Gtk.Window):
         self.suspend_spin_button.set_value(0)
         monitor.la = datetime.datetime.now()
         print(('[' + str(datetime.datetime.now().time())[:8] + ']'\
-                + ' Monitor suspension is reset, now resuming.'))
+                + ' Monitor suspension is reset, now resuming...'))
 
     def clock(self):
         now = datetime.datetime.now()

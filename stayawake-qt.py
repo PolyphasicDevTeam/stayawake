@@ -183,9 +183,21 @@ class Dashboard(QWidget):
                 + datetime.timedelta(minutes=self.suspend_spin_button.value())
         self.monitor_timer.setText('The monitor will resume at: '
             + str(monitor.la)[:19])
+        if self.suspend_spin_button.value() is not 0:
+            print('[' + str(datetime.datetime.now().time())[:8] + ']'\
+                + ' Monitor suspended for '
+                + str(self.suspend_spin_button.value())
+                + ' minutes until '
+                + str(monitor.la)[:19])
+        self.suspend_spin_button.setValue(0)
 
     def on_cancel(self):
         monitor.la = datetime.datetime.now()
+        self.suspend_spin_button.setValue(0)
+        print(('[' + str(datetime.datetime.now().time())[:8] + ']'\
+                + ' Monitor suspension is reset, now resuming...'))
+
+
 
 def main():
     w = Waker(alarm_dir, volume_max_command, play_command)

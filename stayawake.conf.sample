@@ -7,7 +7,7 @@ max-inactivity = 4
 alarm-folder = ~/Music/alarms/
 
 # For Unix with pulseaudio
-volume-max-command = #pactl set-sink-mute 0 0 & pactl set-sink-volume 0 100%% 
+volume-max-command = pactl set-sink-mute 0 0 & pactl set-sink-volume 0 100%% 
 # For Windows with nircmd
 #volume-max-command = nircmd.exe mutesysvolume 0 & nircmd.exe setsysvolume 65535
 

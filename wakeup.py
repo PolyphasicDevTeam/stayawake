@@ -13,7 +13,7 @@ class Waker(Thread):
         self.first = True
     def wakeup(self):
         timenow = datetime.now().time()
-        message = '[' + str(timenow)[:8] + ']' + "Wake Up!"\
+        message = '[' + str(timenow)[:8] + ']' + " Wake Up!"\
             + "Now Playing " + os.path.join(
             self.dir, random.choice(os.listdir(self.dir)))
         if self.vup != '':
