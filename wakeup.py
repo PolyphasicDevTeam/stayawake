@@ -33,4 +33,5 @@ class Waker(Thread):
 
     def exit(self):
         if self.c:
-            os.kill(self.c.pid, signal.SIGTERM)
+                if self.c.poll() is None:
+                    self.c.kill()
