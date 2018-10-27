@@ -28,6 +28,7 @@ Clone the repo, use either pip or your distro's package manager to install the d
 Finally, run `./stayawake-gtk.py` or `./stayawake-qt.py`.
 
 Linux with binary:  
+Only the Qt frontend is provided in binaries.  
 Install `mpg123`. Download the release binaries, place sound files in the alarms folder, rename and edit the config, and run the executable.
 
 Windows:  
