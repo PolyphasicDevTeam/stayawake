@@ -22,12 +22,10 @@ class Waker(Thread):
         command = self.pcd + ' ' + self.file
         command = command.split()
         if self.first is True:
-            print(command)
             self.first = False
             print(message)
             self.c = subprocess.Popen(command)
         if self.c.poll() is not None:
-            print(command)
             print(message)
             self.c = subprocess.Popen(command)
 
