@@ -15,12 +15,12 @@ from gi.repository import Gtk, GObject, GLib, Gdk
 from configload import configload
 from wakeup import Waker
 import monitor
-import sleepnext
+from schedule import Schedule
 
 warnings.simplefilter('ignore')
 # CLI options
 options = argparse.ArgumentParser(
-        description='The program that helps you stay awake.')
+        description='Advanced alarm system')
 options.add_argument('-c','--config',
                      metavar='CONF', help='specify config file')
 options.add_argument('-v','--verbose', action='store_true',
@@ -41,8 +41,8 @@ elif os.path.isfile(os.path.expandvars(
     print('Using configuration file: ', path)
 else:
     print('Configuration file not found.\n\
-        It should be named "stayawake.conf" in the same directory as \
-          the executable or in $HOME/.config/stayawake/ (Unix only)')
+It should be named "stayawake.conf" in the same directory as \
+the executable or in $HOME/.config/stayawake/')
     sys.exit()
 
 settings = configload(path)
@@ -52,19 +52,9 @@ volume_max_command = settings[2]
 play_command = settings[3]
 schedule_name = settings[4]
 schedule = settings[5]
-# Format schedule into lists
-schedule = schedule.split()
-schedule_pretty = ''
-for i in range(0,len(schedule)):
-    schedule[i] = schedule[i].split('-')
-for i in range(0,len(schedule)):
-    schedule_pretty += schedule[i][0]
-    schedule_pretty += '-'
-    schedule_pretty += schedule[i][1]
-    schedule_pretty += ' '
 sleep_names = settings[6]
-sleep_names = shlex.split(sleep_names)
 
+my_schedule = Schedule(schedule, sleep_names)
 # Settings will be printed out to stdout in verbose mode
 if verbose:
     print('max-inactivity = ', max_inactivity)
@@ -77,7 +67,7 @@ if verbose:
 
 class Dashboard(Gtk.Window):
     def __init__(self):
-        Gtk.Window.__init__(self, title="StayAwake")
+        Gtk.Window.__init__(self, title="StayAwake GTK")
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=18)
         self.add(vbox)
         vbox.set_margin_top(20)
@@ -93,12 +83,11 @@ class Dashboard(Gtk.Window):
         vbox.add(config_label)
 
         global schedule_name
-        global schedule
-        global schedule_pretty
+        global my_schedule
         schedule_box = Gtk.ListBox()
         schedule_label = Gtk.Label(label="Current Schedule")
         schedule_name = Gtk.Label(label=schedule_name)
-        schedule_times = Gtk.Label(label=schedule_pretty)
+        schedule_times = Gtk.Label(label=my_schedule.prettify())
         schedule_box.add(schedule_label)
         schedule_box.add(schedule_name)
         schedule_box.add(schedule_times)
@@ -178,14 +167,21 @@ class Dashboard(Gtk.Window):
         now = datetime.datetime.now()
         diff = now - monitor.la
         self.status_time.set_text(str(now)[:19])
-        if monitor.la < now:
-            self.activity_timer_label.set_text(str(diff.seconds)
-                + '.' + str(diff.microseconds)[:1]
-                + 's / ' + str(max_inactivity.seconds) + 's')
-        self.status_sleep_next.set_text('Next Sleep: '
-                + sleepnext.next(schedule, sleep_names))
-        self.status_time_remaining.set_text(sleepnext.time_remaining(schedule)
-                + ' remaining')
+        awake_msg = "Hey! You should be asleep now. What are you doing?"
+        #print(my_schedule.isAsleep())
+        if my_schedule.isAsleep():
+            self.activity_timer_label.set_text(awake_msg)
+            self.status_sleep_next.set_text(awake_msg)
+            self.status_time_remaining.set_text(awake_msg)
+        else:
+            if monitor.la < now:
+                self.activity_timer_label.set_text(str(diff.seconds)
+                    + '.' + str(diff.microseconds)[:1]
+                    + 's / ' + str(max_inactivity.seconds) + 's')
+            self.status_sleep_next.set_text('Next Sleep: '
+                    + my_schedule.next())
+            self.status_time_remaining.set_text(my_schedule.remaining()
+                    + ' remaining')
         return True
 
     def start_clock(self):
@@ -198,19 +194,20 @@ def main():
     w = Waker(alarm_dir, volume_max_command, play_command)
 
     while 1:
-        diff = datetime.datetime.now() - monitor.la
-        if diff >= max_inactivity:
-            # Label colour change
-            window.activity_timer_label.override_background_color(0,
-                Gdk.RGBA(red=1.0, green=0.0, blue=0.0, alpha=1.0))
-            window.activity_timer_label.override_color(0,
-                Gdk.RGBA(red=1.0, green=1.0, blue=1.0, alpha=1.0))
-            # Alarm playing
-            w.wakeup()
-        if diff < max_inactivity:
-            w.exit()
-            window.activity_timer_label.override_background_color(0, None)
-            window.activity_timer_label.override_color(0, None)
+        if not my_schedule.isAsleep():
+            diff = datetime.datetime.now() - monitor.la
+            if diff >= max_inactivity:
+                # Label colour change
+                window.activity_timer_label.override_background_color(0,
+                    Gdk.RGBA(red=1.0, green=0.0, blue=0.0, alpha=1.0))
+                window.activity_timer_label.override_color(0,
+                    Gdk.RGBA(red=1.0, green=1.0, blue=1.0, alpha=1.0))
+                # Alarm playing
+                w.wakeup()
+            if diff < max_inactivity:
+                w.exit()
+                window.activity_timer_label.override_background_color(0, None)
+                window.activity_timer_label.override_color(0, None)
         time.sleep(1)
 
 

@@ -1,16 +1,13 @@
 # StayAwake
-An application that helps you stay awake by playing alarms in response to inactivity.
+Advanced wakeup alarm system
 
 ### Features
-- Play alarms in response to predefined inactivity
+- Play alarms in response to predefined period of inactivity
 - Auto-adjust volume for playing alarms
 - Log each lapse in alertness
 - Schedule dashboard
 - Monitor suspend
-
-### Planned Features
-- Time block config
-- Arctimes
+- Automatically stays suspends during defined sleep times
 
 ### Prerequisites
 Python 3.7
@@ -31,35 +28,39 @@ Linux with binary:
 Only the Qt frontend is provided in binaries.  
 Install `mpg123`. Download the release binaries, place sound files in the alarms folder, rename and edit the config, and run the executable.
 
-Windows:  
-Download the release binaries and extract the folder. Rename `stayawake.conf.sample` to `stayawake.conf` and edit it. To prevent errors, use a text editor that support UNIX line endings. Place the alarm sounds in the `alarms` folder or specify another folder in the config file. The GTK+ frontend is not supported on Windows.
+Windows with binary:  
+Download the release binaries and extract the folder. Run 'stayawake-conf.exe' to configure StayAwake. "Save local" means to save the config file in the same folder as the executable and "Save user" means to save the file in your user config folder. You can only have a one user config, but any number of local configs. StayAwake always try to read the local config first. It will try to read your user config only when there is no file named 'stayawake.conf' in the same folder as the executable.
  
 ### GTK+ or Qt
 StayAwake offers two frontends: GTK+3 and Qt5.  
 GTK+ is better decorated, but the Qt5 frontend is more cross-platform.  
 Linux users:  
-If you are using a GTK+ based desktop environment(GNOME, LXDE, Xfce, MATE etc.), use the GTK+ frontend.  
-If you are using a Qt based desktop environment(KDE, LXQt), use the Qt frontend.  
+If you are using a GTK+ based desktop environment(GNOME, LXDE, Xfce, MATE etc.), use the GTK+ frontend.  If you are using a Qt based desktop environment(KDE, LXQt), use the Qt frontend.  
 Everyone else:  
 Use the Qt frontend.
 
 ### Alarm Sounds
 You can select files from [this](https://www.dropbox.com/s/dihn9m58wfnyxwk/alarm.rar) which is linked to by the now-abandoned [NMO](https://github.com/PolyphasicDevTeam/NoMoreOversleeps). Choose shorter alarms over longer ones.
 
-### Issues
+### Safety Warning
+Please note that I am IN NO WAY responsible over ANY damage caused to you through use of this tool. You are recommended to do something other than using a computer if you still fall asleep after several alarms. Repeated use of sound alarms might cause hearing damage and/or tolerance to alarms. YOU HAVE BEEN WARNED. 
+
+### Known Issues:
+- May not work on Wayland:
+    This program depends on pynput to detect input activity, which does not include full wayland support yet. This might change in the future.
+### Report a Bug
 If you encounter any problems, please submit an issue.  
-Provide the following information:  
+Try to provide the following information:  
 - Your operating system
 - Your python version
+- Steps to reproduce
 - The output with `-v` option
 - Your config file
 
-### Todo
 #### Near future
 - Log file support
-- GUI config helper
-- time blocks for monitoring
 #### Intermediate future
+- Integration with [thyme](https://github.com/sourcegraph/thyme)
 - Schedule statistics
 - Discord integration
 #### And the beyond
