@@ -28,20 +28,20 @@ verbose = options.parse_args().verbose
 path = ''
 if options.parse_args().config:
     path = os.path.expanduser(options.parse_args().config)
-    print('Using configuration file: ' , path)
 elif os.path.isfile('stayawake.conf'):
     path = 'stayawake.conf'
-    print('Using configuration file: ', path)
 elif os.path.isfile(os.path.expandvars(
                             '$HOME/.config/stayawake/stayawake.conf')):
     path = os.path.expanduser('~/.config/stayawake/stayawake.conf')
-    print('Using configuration file: ', path)
+elif os.path.isfile(os.path.expandvars('%USERPROFILE%\\AppData\\Roaming\\stayawake\\stayawake.conf')):
+    path = '%USERPROFILE%\\AppData\\Roaming\\stayawake\\stayawake.conf'
 else:
     print('Configuration file not found.\n\
 It should be named "stayawake.conf" in the same directory as \
 the executable or in $HOME/.config/stayawake/ (Unix) \
 or in %USERPROFILE%\\AppData\\Roaming\\stayawake\\stayawake.conf (Microsoft)')
     sys.exit()
+print('Using configuration file: ', path)
 
 settings = configload(path)
 max_inactivity = datetime.timedelta(seconds=settings[0])

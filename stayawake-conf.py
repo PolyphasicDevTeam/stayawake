@@ -138,8 +138,8 @@ set-sink-volume 0 65535"
         if os.name == 'nt':
             self.max_inactivity = 50
             self.alarm_folder = 'alarms'
-            self.volume_max_command = '.\mpg123.exe -q'
-            self.play_command = ""
+            self.volume_max_command = ''
+            self.play_command = '.\mpg123.exe -q'
             self.schedule_name = 'E1'
             self.schedule = '22:00-04:00 11:00-11:20'
             self.sleep_names = '"Core" "Nap"'
@@ -177,8 +177,11 @@ set-sink-volume 0 65535"
         self.load()
 
     def deleteLocal(self):
-        os.remove('stayawake.conf')
-        print('Removed stayawake.conf (Local)')
+        if os.path.isfile('stayawake.conf'): 
+            os.remove('stayawake.conf')
+            print('Removed stayawake.conf (Local)')
+        else:
+            print("No local configuration file found.")
 
     def saveLocal(self):
         path = 'stayawake.conf'
