@@ -33,7 +33,8 @@ elif os.path.isfile('stayawake.conf'):
 elif os.path.isfile(os.path.expandvars(
                             '$HOME/.config/stayawake/stayawake.conf')):
     path = os.path.expanduser('~/.config/stayawake/stayawake.conf')
-elif os.path.isfile(os.path.expandvars('%USERPROFILE%\\AppData\\Roaming\\stayawake\\stayawake.conf')):
+elif os.path.isfile(os.path.expandvars('%USERPROFILE%\\AppData\\Roaming\
+        \\stayawake\\stayawake.conf')):
     path = '%USERPROFILE%\\AppData\\Roaming\\stayawake\\stayawake.conf'
 else:
     print('Configuration file not found.\n\
@@ -175,7 +176,8 @@ def main():
             diff = datetime.datetime.now() - monitor.la
             if diff >= max_inactivity:
                 # Label colour change
-                window.timer_label.setStyleSheet("color: #fff; background-color: #f00")
+                window.timer_label.setStyleSheet("color: #fff;" +
+                        "background-color: #f00")
                 # Alarm playing
                 w.wakeup()
             if diff < max_inactivity:

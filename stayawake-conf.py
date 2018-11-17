@@ -193,5 +193,3 @@ set-sink-volume 0 65535"
 app = QApplication(sys.argv)
 window = ConfigHelper()
 sys.exit(app.exec_())
-
-

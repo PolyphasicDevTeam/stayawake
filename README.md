@@ -48,6 +48,9 @@ Please note that I am in NO WAY responsible over ANY damage caused to you throug
 ### Known Issues:
 - May not work on Wayland:
     This program depends on pynput to detect input activity, which does not include full wayland support yet. This might change in the future.
+- Xlib.error.DisplayConnectionError: Can't connect to display ":0": b'Invalid MIT-MAGIC-COOKIE-1 key'
+    This appears to be a pynput bug. For the time being, use `xhost +` command
+to circumvent this.
 ### Report a Bug
 If you encounter any problems, please submit an issue.  
 Try to provide the following information:  
@@ -57,6 +60,7 @@ Try to provide the following information:
 - The output with `-v` option
 - Your config file
 
+### Plans
 #### Near future
 - Log file support
 #### Intermediate future

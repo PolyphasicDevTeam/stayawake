@@ -20,7 +20,7 @@ from schedule import Schedule
 warnings.simplefilter('ignore')
 # CLI options
 options = argparse.ArgumentParser(
-        description='Advanced alarm system')
+    description='Advanced alarm system')
 options.add_argument('-c','--config',
                      metavar='CONF', help='specify config file')
 options.add_argument('-v','--verbose', action='store_true',
@@ -144,7 +144,7 @@ class Dashboard(Gtk.Window):
             .do_activate(activity_box.get_row_at_index(0))
         vbox.add(activity_box)
 
-    def on_suspend(self, button):
+    def on_suspend(self):
         monitor.la = datetime.datetime.now() + datetime.timedelta(
             minutes=self.suspend_spin_button.get_value_as_int())
         self.activity_timer_label.set_text('The monitor will resume at: '
@@ -157,7 +157,7 @@ class Dashboard(Gtk.Window):
                 + str(monitor.la)[:19])
         self.suspend_spin_button.set_value(0)
 
-    def on_cancel(self, button):
+    def on_cancel(self):
         self.suspend_spin_button.set_value(0)
         monitor.la = datetime.datetime.now()
         print(('[' + str(datetime.datetime.now().time())[:8] + ']'\
@@ -179,7 +179,7 @@ class Dashboard(Gtk.Window):
                     + '.' + str(diff.microseconds)[:1]
                     + 's / ' + str(max_inactivity.seconds) + 's')
             self.status_sleep_next.set_text('Next Sleep: '
-                    + my_schedule.next())
+                                            + my_schedule.next())
             self.status_time_remaining.set_text(my_schedule.remaining()
                     + ' remaining')
         return True
@@ -229,4 +229,3 @@ window.connect("destroy", Gtk.main_quit)
 window.show_all()
 window.start_clock()
 Gtk.main()
-
