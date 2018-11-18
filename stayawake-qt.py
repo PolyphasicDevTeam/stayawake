@@ -26,16 +26,16 @@ options.add_argument('-v','--verbose', action='store_true',
 options.parse_args()
 verbose = options.parse_args().verbose
 path = ''
+pathunix = os.path.expandvars('$HOME/.config/stayawake/stayawake.conf')
+pathwin32 = os.path.expandvars('%USERPROFILE%\AppData\Roaming\stayawake\stayawake.conf')
 if options.parse_args().config:
     path = os.path.expanduser(options.parse_args().config)
 elif os.path.isfile('stayawake.conf'):
     path = 'stayawake.conf'
-elif os.path.isfile(os.path.expandvars(
-                            '$HOME/.config/stayawake/stayawake.conf')):
-    path = os.path.expanduser('~/.config/stayawake/stayawake.conf')
-elif os.path.isfile(os.path.expandvars('%USERPROFILE%\\AppData\\Roaming\
-        \\stayawake\\stayawake.conf')):
-    path = '%USERPROFILE%\\AppData\\Roaming\\stayawake\\stayawake.conf'
+elif os.path.isfile(pathunix):
+    path = pathunix
+elif os.path.isfile(pathwin32):
+    path = pathwin32
 else:
     print('Configuration file not found.\n\
 It should be named "stayawake.conf" in the same directory as \
