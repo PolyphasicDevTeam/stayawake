@@ -144,7 +144,7 @@ class Dashboard(Gtk.Window):
             .do_activate(activity_box.get_row_at_index(0))
         vbox.add(activity_box)
 
-    def on_suspend(self):
+    def on_suspend(self, button):
         monitor.la = datetime.datetime.now() + datetime.timedelta(
             minutes=self.suspend_spin_button.get_value_as_int())
         self.activity_timer_label.set_text('The monitor will resume at: '
@@ -157,7 +157,7 @@ class Dashboard(Gtk.Window):
                 + str(monitor.la)[:19])
         self.suspend_spin_button.set_value(0)
 
-    def on_cancel(self):
+    def on_cancel(self, button):
         self.suspend_spin_button.set_value(0)
         monitor.la = datetime.datetime.now()
         print(('[' + str(datetime.datetime.now().time())[:8] + ']'\
