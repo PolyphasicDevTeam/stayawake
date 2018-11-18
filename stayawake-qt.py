@@ -98,6 +98,8 @@ class Dashboard(QWidget):
         self.timer_label = QLabel()
         self.suspend_label = QLabel("Suspend Monitor")
         self.suspend_spinbox = QSpinBox()
+        self.suspend_spinbox.setMaximum(1200)
+        self.suspend_spinbox.setMinimum(0)
         self.suspend_button_box = QWidget()
         self.suspend_button_layout = QHBoxLayout()
         self.apply_button = QPushButton("Apply")
