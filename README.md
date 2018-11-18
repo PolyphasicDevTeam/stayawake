@@ -17,19 +17,15 @@ On Windows, install `nircmd` and uncomment the line in the config.
 `mpg123` is the default player. It is available for both Windows and Linux under LGPLv2.1. It is included in the Windows release binaries.
 
 ### Setup
-Linux from source:  
-Clone the repo, use either pip or your distro's package manager to install the dependencies, and Copy `stayawake.conf.sample` to your `~/.config/stayawake/stayawake.conf` and edit it according to your needs. Place the alarm sounds in the folder specified in the config file.(default: ~/Music/alarms) StayAwake looks for the config in the following places, with fallback:  
+####Linux from source(Recommended):  
+Clone the repo, use either pip or your distro's package manager to install the dependencies, and Copy `stayawake.conf.sample` to your `~/.config/stayawake/stayawake.conf` and edit it according to your needs. Alternatively, you can run `stayawake-conf.py` to configure it graphically. Place the alarm sounds in the folder specified in the config file.(default: ~/Music/alarms) StayAwake looks for the config in the following places, with fallback:  
  - The file specified with `-c CONF` CLI option
  - In the same folder as the executable(`./stayawake.conf`)
- - ~/.config/stayawake/stayawake.conf  
+ - $HOME/.config/stayawake/stayawake.conf  
 Finally, run `./stayawake-gtk.py` or `./stayawake-qt.py`.
 
-Linux with binary:  
-Only the Qt frontend is provided in binaries.  
-Install `mpg123`. Download the release binaries, place sound files in the alarms folder, rename and edit the config, and run the executable.
-
-Windows with binary:  
-Download the release binaries and extract the folder. Run 'stayawake-conf.exe' to configure StayAwake. "Save local" means to save the config file in the same folder as the executable and "Save user" means to save the file in your user config folder. You can only have a one user config, but any number of local configs. StayAwake always try to read the local config first. It will try to read your user config only when there is no file named 'stayawake.conf' in the same folder as the executable.
+####Windows with binary:  
+Download the release binaries and extract the folder. Run 'stayawake-conf.exe' to configure StayAwake. "Save local" means to save the config file in the same folder as the executable and "Save user" means to save the file in your user config folder. You can only have a one user config, but any number of local configs. StayAwake always tries to read the local config first. It will try to read your user config only when there is no file named 'stayawake.conf' in the same folder as the executable.
  
 ### GTK+ or Qt
 StayAwake offers two frontends: GTK+3 and Qt5.  
@@ -62,6 +58,7 @@ Try to provide the following information:
 
 ### Plans
 #### Near future
+- Windows support for volume adjustment
 - Log file support
 #### Intermediate future
 - Integration with [thyme](https://github.com/sourcegraph/thyme)
