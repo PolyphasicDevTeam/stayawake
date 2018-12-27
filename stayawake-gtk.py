@@ -196,6 +196,11 @@ def main():
     while 1:
         if not my_schedule.isAsleep():
             diff = datetime.datetime.now() - monitor.la
+            if diff >= 0.85 * max_inactivity:
+                os.system("notify-send -a Stayawake\ GTK Do\ something! \"If \
+you don\'t show any activity in the next " + str(round(max_inactivity.seconds
+ * 0.15))  + " seconds, \
+an alarm will ring.\"")
             if diff >= max_inactivity:
                 # Label colour change
                 window.activity_timer_label.override_background_color(0,
