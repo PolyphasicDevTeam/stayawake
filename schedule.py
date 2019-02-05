@@ -1,19 +1,38 @@
 import datetime 
 from math import floor
 import shlex
+import copy
 class Schedule:
     def __init__(self, times, names):
         self.times = times.split()
-        for i in range(0, len(self.times)):
+        for i in range(len(self.times)):
             self.times[i] = self.times[i].split('-')
+        self.times_pristine = copy.deepcopy(self.times)
         self.names = names
         self.names = shlex.split(self.names)
+
+    def __getitem__(self, key):
+        idx = self.names.index(key)
+        return self.times[idx]
+
+    def pristine(self):
+        self.times = copy.deepcopy(self.times_pristine)
+
+    def flex_next_sleep(self, amount):
+        for i in range(len(self[self.next()])):
+            time = self[self.next()][i]
+            flex = datetime.timedelta(minutes=amount)
+            time = datetime.datetime.strptime(time, '%H:%M') 
+            time += flex
+            time = datetime.datetime.strftime(time, '%H:%M')
+            self.times[self.names.index(self.next())][i] = time
 
     def next(self):
         now = datetime.datetime.now()
         next_sleep = []
         for i in range(0, len(self.times)):
-            next_sleep.append(datetime.datetime.strptime(self.times[i][0], "%H:%M"))
+            next_sleep.append(datetime.datetime.strptime(self.times[i][0],
+                "%H:%M"))
             next_sleep[i] = next_sleep[i].replace(year=now.year, month=now.month, day=now.day)
             if next_sleep[i] < now:
                 next_sleep[i] += datetime.timedelta(days=1)
@@ -42,7 +61,8 @@ class Schedule:
             times_pretty += self.times[i][0]
             times_pretty += '-'
             times_pretty += self.times[i][1]
-            times_pretty += ' '
+            if i is not len(self.times) - 1:
+                times_pretty += ' '
         return times_pretty
 
     def isAsleep(self):

@@ -46,23 +46,23 @@ the executable or in $HOME/.config/stayawake/')
     sys.exit()
 
 settings = configload(path)
-max_inactivity = datetime.timedelta(seconds=settings[0])
-alarm_dir = settings[1]
-volume_max_command = settings[2]
-play_command = settings[3]
-schedule_name = settings[4]
-schedule = settings[5]
-sleep_names = settings[6]
+settings['max_inactivity'] = datetime.timedelta(seconds=settings['max_inactivity'])
+#settings['alarm_dir'] = settings[1]
+#settings['volume_max_command'] = settings[2]
+#settings['play_command'] = settings[3]
+#settings['schedule_name'] = settings[4]
+#schedule = settings[5]
+#settings['sleep_names'] = settings[6]
 
-my_schedule = Schedule(schedule, sleep_names)
+my_schedule = Schedule(settings['schedule'], settings['sleep_names'])
 # Settings will be printed out to stdout in verbose mode
 if verbose:
-    print('max-inactivity = ', max_inactivity)
-    print('alarm-folder = ', alarm_dir)
-    print('volume-max-command = ', volume_max_command)
-    print('play-command = ', play_command)
-    print('schedule = ', schedule)
-    print('sleep-names = ', sleep_names)
+    print('max-inactivity = ', settings['max_inactivity'])
+    print('alarm-folder = ', settings['alarm_dir'])
+    print('volume-max-command = ', settings['volume_max_command'])
+    print('play-command = ', settings['play_command'])
+    print('schedule = ',settings['schedule'])
+    print('sleep-names = ', settings['sleep_names'])
 
 
 class Dashboard(Gtk.Window):
@@ -82,14 +82,12 @@ class Dashboard(Gtk.Window):
         config_label = Gtk.Label(label="Using:  " + path)
         vbox.add(config_label)
 
-        global schedule_name
-        global my_schedule
         schedule_box = Gtk.ListBox()
         schedule_label = Gtk.Label(label="Current Schedule")
-        schedule_name = Gtk.Label(label=schedule_name)
+        schedule_name_label = Gtk.Label(label=settings['schedule_name'])
         schedule_times = Gtk.Label(label=my_schedule.prettify())
         schedule_box.add(schedule_label)
-        schedule_box.add(schedule_name)
+        schedule_box.add(schedule_name_label)
         schedule_box.add(schedule_times)
         schedule_box.get_row_at_index(0)\
             .do_activate(schedule_box.get_row_at_index(0))
@@ -177,7 +175,7 @@ class Dashboard(Gtk.Window):
             if monitor.la < now:
                 self.activity_timer_label.set_text(str(diff.seconds)
                     + '.' + str(diff.microseconds)[:1]
-                    + 's / ' + str(max_inactivity.seconds) + 's')
+                    + 's / ' + str(settings['max_inactivity'].seconds) + 's')
             self.status_sleep_next.set_text('Next Sleep: '
                                             + my_schedule.next())
             self.status_time_remaining.set_text(my_schedule.remaining()
@@ -191,17 +189,17 @@ window = Dashboard()
 
 
 def main():
-    w = Waker(alarm_dir, volume_max_command, play_command)
+    w = Waker(settings['alarm_dir'], settings['volume_max_command'], settings['play_command'])
 
     while 1:
         if not my_schedule.isAsleep():
             diff = datetime.datetime.now() - monitor.la
-            if diff >= 0.85 * max_inactivity:
+            if diff >= 0.85 * settings['max_inactivity']:
                 os.system("notify-send -a Stayawake\ GTK Do\ something! \"If \
-you don\'t show any activity in the next " + str(round(max_inactivity.seconds
+you don\'t show any activity in the next " + str(round(settings['max_inactivity'].seconds
  * 0.15))  + " seconds, \
 an alarm will ring.\"")
-            if diff >= max_inactivity:
+            if diff >= settings['max_inactivity']:
                 # Label colour change
                 window.activity_timer_label.override_background_color(0,
                     Gdk.RGBA(red=1.0, green=0.0, blue=0.0, alpha=1.0))
@@ -209,7 +207,7 @@ an alarm will ring.\"")
                     Gdk.RGBA(red=1.0, green=1.0, blue=1.0, alpha=1.0))
                 # Alarm playing
                 w.wakeup()
-            if diff < max_inactivity:
+            if diff < settings['max_inactivity']:
                 w.exit()
                 window.activity_timer_label.override_background_color(0, None)
                 window.activity_timer_label.override_color(0, None)

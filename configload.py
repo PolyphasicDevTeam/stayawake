@@ -11,4 +11,11 @@ def configload(path):
     sleep_names = config['Settings']['sleep-names']
     if volume_max_command == '':
         print("Remember to turn the volume up to an unbearably high level!")
-    return [max_inactivity, alarm_dir, volume_max_command, play_command, schedule_name, schedule, sleep_names]
+    retdict = {"max_inactivity": max_inactivity,
+                "alarm_dir": alarm_dir, 
+                "volume_max_command": volume_max_command, 
+                "play_command": play_command, 
+                "schedule_name": schedule_name,
+                "schedule": schedule, 
+                "sleep_names": sleep_names}
+    return retdict

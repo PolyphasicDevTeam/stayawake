@@ -47,6 +47,7 @@ class ConfigHelper(QWidget):
         sn_ex_label = QLabel('\tExample: "Core" "Dawn Nap" "Noon Nap"')
         # Widgets
         self.inactv = QSpinBox()
+        self.inactv.setMaximum(3600)
         self.folder = QPushButton("Choose a folder..")
         self.folder.clicked.connect(self.chooseFolder)
         self.vmaxcmd = QLineEdit()
