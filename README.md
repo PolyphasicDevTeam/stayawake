@@ -1,20 +1,23 @@
 # StayAwake
-Advanced wakeup alarm system
+Advanced wakeup alarm system written using PyQt5
 
+### Screenshot
+![][screenshot.png "StayAwake on KDE Plasma with Adapta theme"]
 ### Features
 - Play alarms after to predefined period of inactivity
 - Auto-adjust volume for playing alarms
 - Log each inactivity
 - Schedule dashboard
 - Monitor suspend
+- Move sleep times
 - Automatically suspends during defined sleep times
 
 ### Prerequisites
 Python 3.7
-Python modules: `pynput`, `pygobject`(for GTK+) or `pyqt5`(for Qt)
+Python modules: `pynput` and `pyqt5`
 `pulseaudio` is used for auto-adjusting volume on Linux(It comes by default on most systems).
-On Windows, install `nircmd` and uncomment the line in the config.
-`mpg123` is the default player. It is available for both Windows and Linux under LGPLv2.1. It is included in the Windows release binaries.
+On Windows, install `nircmd` and change the wakeup command to it.
+`mpg123` is the default player. It is available for both Windows and Linux under LGPLv2.1.
 
 ### Setup
 #### Linux from source(Recommended):  
@@ -22,16 +25,14 @@ Clone the repo, use either pip or your distro's package manager to install the d
  - The file specified with `-c CONF` CLI option
  - In the same folder as the executable(`./stayawake.conf`)
  - $HOME/.config/stayawake/stayawake.conf  
-Finally, run `./stayawake-gtk.py` or `./stayawake-qt.py`.
+Finally, run `./stayawake-qt.py`.
+You can optionally install the .desktop file into your application directory
+to make stayawake available as a desktop application. Remember to change the
+path to icon.
 
 #### Windows with binary:  
-Download the release binaries and extract the folder. Run 'stayawake-conf.exe' to configure StayAwake. "Save local" means to save the config file in the same folder as the executable and "Save user" means to save the file in your user config folder. You can only have a one user config, but any number of local configs. StayAwake always tries to read the local config first. It will try to read your user config only when there is no file named 'stayawake.conf' in the same folder as the executable.
+Download the release binaries and extract the folder. Run 'stayawake-conf.exe' to configure StayAwake. "Save local" means to save the config file in the same folder as the executable and "Save user" means to save the file in your user config folder. You can only have a one user config, but any number of local configs. StayAwake always tries to read the local config first. The user config file will only be read when there is no file named 'stayawake.conf' in the same folder as the executable.
  
-### GTK+ or Qt
-StayAwake offers two frontends: GTK+3 and Qt5.  
-Qt5 is available cross-platform while GTK+3 is only available on Linux for the
-most part. If you are using Linux, you can use the one you prefer. For other u
-
 ### Alarm Sounds
 You can select files from [this](https://www.dropbox.com/s/dihn9m58wfnyxwk/alarm.rar) which is linked to by the now-abandoned [NMO](https://github.com/PolyphasicDevTeam/NoMoreOversleeps). Choose shorter alarms over longer ones.
 
