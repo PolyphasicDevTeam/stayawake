@@ -2,7 +2,7 @@
 Advanced wakeup alarm system written using PyQt5
 
 ### Screenshot
-!(screenshot.png "StayAwake on KDE Plasma with Adapta theme")
+![foobar](screenshot.png "StayAwake on KDE Plasma with Adapta theme")
 ### Features
 - Play alarms after to predefined period of inactivity
 - Auto-adjust volume for playing alarms
