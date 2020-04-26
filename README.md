@@ -47,8 +47,6 @@ Please note that I am in NO WAY responsible over ANY damage caused to you throug
 to circumvent this.
 ### Report a Bug
 If you encounter any problems, please submit an issue.  
-If you really don't know how to use github, you can send a message to
-zandimna#3117 on Discord.
 Try to provide the following information:  
 - Your operating system
 - Your python version
