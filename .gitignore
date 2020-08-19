@@ -1,2 +1,3 @@
 target/*
 env/*
+src/main/python/__pycache__/*
