@@ -11,7 +11,7 @@ import configparser
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-from conf import ConfigHelper
+from conf import ConfigHelper, OptionDialog
 from configload import configload
 from wakeup import Waker
 from schedule import Schedule
@@ -19,7 +19,7 @@ import monitor
 
 # CLI options
 options = argparse.ArgumentParser(
-        description='Advanced wakeup alarm utility')
+        description='Advanced wakeup alarm system written in PyQt5')
 options.add_argument('-c','--config',
                      metavar='CONF', help='specify config file')
 options.add_argument('-v','--verbose', action='store_true',
@@ -34,28 +34,27 @@ path = ''
 class Dashboard(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle('StayAwake Qt')
+        self.setWindowTitle('StayAwake')
         title = QLabel('StayAwake')
         version = QLabel("Version: 0.5")
         title.setStyleSheet("font: 30pt")
         self.path = ''
-        pathunix = os.path.expandvars('$HOME/.config/stayawake/stayawake.conf')
         pathwin32 = os.path.expandvars('%USERPROFILE%\AppData\Roaming\stayawake\stayawake.conf')
-        if options.parse_args().config:
-            self.path = os.self.path.expanduser(options.parse_args().config)
-        elif os.path.isfile('stayawake.conf'):
-            self.path = 'stayawake.conf'
-        elif os.path.isfile(pathunix):
-            self.path = pathunix
-        elif os.path.isfile(pathwin32):
-            self.path = pathwin32
-        else:
-            self.path = None
-            print('Configuration file not found.\n\
-        It should be named "stayawake.conf" in the same directory as \
-        the executable or in $HOME/.config/stayawake/ (Unix) \
-        or in %USERPROFILE%\\AppData\\Roaming\\stayawake\\stayawake.conf (Windows)')
-            #sys.exit()
+
+        if sys.platform.startswith("linux"):
+            if os.path.isfile('stayawake.conf'):
+                self.path = 'stayawake.conf'
+            elif os.path.isfile(os.path.expandvars('$HOME/.config/stayawake/stayawake.conf')):
+                self.path = os.path.expandvars('$HOME/.config/stayawake/stayawake.conf')
+            else:
+                self.path = "/etc/stayawake.conf"
+
+        if sys.platform.startswith("win32"):
+            pathwin32 = os.path.expandvars('%USERPROFILE%\AppData\Roaming\stayawake\stayawake.conf')
+            if os.path.isfile('stayawake.conf'):
+                self.path = 'stayawake.conf'
+            elif os.path.isfile(pathwin32):
+                self.path = pathwin32
         # Alias for option values
         settings = configload(self.path)
         self.max_inactivity = datetime.timedelta(seconds=settings['max_inactivity'])
@@ -173,17 +172,19 @@ class Dashboard(QWidget):
 
     def on_flex(self):
         'Callback function when Flex in Options is Applied'
-        schedule.pristine()
-        schedule.flex_next_sleep(self.dialog.flex_spinbox.value())
-        self.schedule_times_label.setText(schedule.prettify())
-        print('[' + str(datetime.datetime.now().time())[:8] + ']' + ' Next sleep flexed ' + str(self.dialog.flex_spinbox.value()) + ' minutes')
+        self.schedule.pristine()
+        self.schedule.flex_next_sleep(self.dialog.flex_spinbox.value())
+        self.schedule_times_label.setText(self.schedule.prettify())
+        print('[' + str(datetime.datetime.now().time())[:8] + ']' +
+                ' Next sleep flexed ' + str(self.dialog.flex_spinbox.value())
+                + ' minutes')
         self.dialog.flex_spinbox.setValue(0)
 
     def on_pristine(self):
         'Callback function to restore the schedule into its pristine state'
         self.dialog.flex_spinbox.setValue(0)
-        schedule.pristine()
-        self.schedule_times_label.setText(schedule.prettify())
+        self.schedule.pristine()
+        self.schedule_times_label.setText(self.schedule.prettify())
         print('[' + str(datetime.datetime.now().time())[:8] + ']' + ' Schedule reset to pristine conditions')
 
     def on_configure(self):
