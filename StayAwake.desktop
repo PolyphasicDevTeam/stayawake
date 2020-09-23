@@ -1,10 +1,10 @@
 [Desktop Entry]
-Name=StayAwake GTK
+Name=StayAwake
 Comment=Advanced wake-up alarm system
 GenericName=Alarms
-Exec=/home/zandimna/code/stayawake/stayawake-gtk.py
-Icon=/home/zandimna/code/stayawake/stayawake.svg
+Exec=/usr/bin/stayawake
+Icon=/usr/share/pixmaps/stayawake.png
 Categories=Utilities;
 Terminal=false
 Type=Application
-Version=0.4.0
+Version=0.5.0
