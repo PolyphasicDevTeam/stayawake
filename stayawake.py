@@ -224,17 +224,17 @@ def main():
         window.wakeups_label.setText(str(wakeups) + " wakeups in this session since " + str(start_time)[:19])
         time.sleep(1)
 
-t = []
+
 mouseactivity = threading.Thread(target=monitor.MouseMonitor)
-keyboardactivity = threading.Thread(target=monitor.KeyboardMonitor)
-main = threading.Thread(target=main)
-t.append(mouseactivity)
-t.append(keyboardactivity)
-t.append(main)
 mouseactivity.daemon = True
+mouseactivity.start()
+
+keyboardactivity = threading.Thread(target=monitor.KeyboardMonitor)
 keyboardactivity.daemon = True
-for thread in t:
-    thread.daemon = True
-    thread.start()
+keyboardactivity.start()
+
+main = threading.Thread(target=main)
+main.daemon = True
+main.start()
 
 sys.exit(app.exec_())

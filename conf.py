@@ -183,15 +183,17 @@ set-sink-volume 0 65535"
 
     def readLocal(self):
         print('Reading from stayawake.conf (Local)')
-        self.settings.read('stayawake.conf')
-        self.read()
-        self.load()
+        if os.path.isfile("stayawake.conf"):
+            self.settings.read('stayawake.conf')
+            self.read()
+            self.load()
 
     def readUser(self):
         print('Reading from user configuration: ' + self.userconf)
-        self.settings.read(self.userconf)
-        self.read()
-        self.load()
+        if os.path.isfile(self.userconf):
+            self.settings.read(self.userconf)
+            self.read()
+            self.load()
 
     def deleteLocal(self):
         if os.path.isfile('stayawake.conf'):
