@@ -118,7 +118,17 @@ class ConfigHelper(QWidget):
         grid.addWidget(restart_notice_label, 17, 0)
         grid.addWidget(self.button_box_buttom, 18, 0)
 
-        self.setLayout(grid)
+        w = QWidget()
+        w.setLayout(grid)
+
+        layout = QVBoxLayout()
+
+        scroll = QScrollArea()
+        scroll.setWidget(w)
+        scroll.setWidgetResizable(True)
+        layout.addWidget(scroll)
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(layout)
         self.show()
 
     def chooseFolder(self):
@@ -141,7 +151,7 @@ class ConfigHelper(QWidget):
             print('Configuration saved to ' + path + '.')
 
     def toDefaults(self):
-        if os.name == 'posix':
+        if sys.platform.startswith("linux"):
             self.max_inactivity = 50
             self.alarm_folder = '~/Music/Alarms'
             self.volume_max_command = "pactl set-sink-mute 0 0 & pactl \
@@ -152,7 +162,7 @@ set-sink-volume 0 65535"
             self.sleep_names = '"Core" "Nap"'
             self.load()
 
-        if os.name == 'nt':
+        if sys.platform.startswith("win32"):
             self.max_inactivity = 50
             self.alarm_folder = 'alarms'
             self.volume_max_command = ''
@@ -161,6 +171,17 @@ set-sink-volume 0 65535"
             self.schedule = '22:00-04:00 11:00-11:20'
             self.sleep_names = '"Core" "Nap"'
             self.load()
+
+        if sys.platform.startswith("darwin"):
+            self.max_inactivity = 50
+            self.alarm_folder = '~/alarms'
+            self.volume_max_command = 'osascript -e "set Volume 10"'
+            self.play_command = 'afplay'
+            self.schedule_name = 'E1'
+            self.schedule = '22:00-04:00 11:00-11:20'
+            self.sleep_names = '"Core" "Nap"'
+            self.load()
+
 
     def load(self):
         self.inactv.setValue(int(self.max_inactivity))
@@ -263,4 +284,6 @@ class OptionDialog(QDialog):
 
         layout.addWidget(suspend_box)
         layout.addWidget(flex_box)
+
+
         self.show()
