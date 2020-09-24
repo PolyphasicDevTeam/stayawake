@@ -55,6 +55,14 @@ class Dashboard(QWidget):
                 self.path = 'stayawake.conf'
             elif os.path.isfile(pathwin32):
                 self.path = pathwin32
+
+        if sys.platform.startswith("darwin"):
+            if os.path.isfile('stayawake.conf'):
+                self.path = 'stayawake.conf'
+            elif os.path.isfile(os.path.expandvars('$HOME/.config/stayawake/stayawake.conf')):
+                self.path = os.path.expandvars('$HOME/.config/stayawake/stayawake.conf')
+            else:
+                self.path = "/etc/stayawake.conf"
         # Alias for option values
         settings = configload(self.path)
         self.max_inactivity = datetime.timedelta(seconds=settings['max_inactivity'])
