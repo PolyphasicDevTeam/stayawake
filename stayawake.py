@@ -63,7 +63,7 @@ class Dashboard(QWidget):
         super().__init__()
         self.setWindowTitle('StayAwake')
         title = QLabel('StayAwake')
-        version = QLabel("Version: 0.5")
+        version = QLabel("Version: 0.5.1")
         title.setStyleSheet("font: 30pt")
 
         self.microsleep_count = 0
