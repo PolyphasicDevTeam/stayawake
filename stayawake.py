@@ -30,7 +30,34 @@ verbose = options.parse_args().verbose
 path = ''
 
 
-# Main window
+class ConfirmationDialog(QWidget):
+    def __init__(self, parent=None):
+        super(ConfirmationDialog, self).__init__(parent)
+        self.setWindowTitle('Microsleep Confirmation')
+        label = QLabel("Was that an actual microsleep?")
+        self.parent = parent
+        quit = QAction("Quit", self)
+        quit.triggered.connect(self.close)
+
+        yes_button = QPushButton("Yes")
+        yes_button.clicked.connect(parent.on_microsleep_confirm)
+        no_button = QPushButton("No")
+        no_button.clicked.connect(parent.on_noconfirm)
+        self.vbox = QVBoxLayout()
+        self.setLayout(self.vbox)
+        self.vbox.addWidget(label)
+        self.vbox.addWidget(yes_button)
+        self.vbox.addWidget(no_button)
+        self.show()
+
+    def closeEvent(self, event):
+        self.parent.confirm_dialog_closed = True
+        event.accept()
+
+
+
+
+
 class Dashboard(QWidget):
     def __init__(self):
         super().__init__()
@@ -38,12 +65,17 @@ class Dashboard(QWidget):
         title = QLabel('StayAwake')
         version = QLabel("Version: 0.5")
         title.setStyleSheet("font: 30pt")
+
+        self.microsleep_count = 0
+        self.confirm_dialog_closed = True
+
         self.path = ''
         pathwin32 = os.path.expandvars('%USERPROFILE%\AppData\Roaming\stayawake\stayawake.conf')
 
         if sys.platform.startswith("linux"):
             if os.path.isfile('stayawake.conf'):
                 self.path = 'stayawake.conf'
+                self.path = os.path.abspath(self.path)
             elif os.path.isfile(os.path.expandvars('$HOME/.config/stayawake/stayawake.conf')):
                 self.path = os.path.expandvars('$HOME/.config/stayawake/stayawake.conf')
             else:
@@ -111,7 +143,7 @@ class Dashboard(QWidget):
         # Bottom section
         self.timer_label = QLabel()
         vbox3.addWidget(self.timer_label)
-        self.wakeups_label = QLabel("0 wakeups in this session.")
+        self.wakeups_label = QLabel()
         vbox3.addWidget(self.wakeups_label)
         self.monitor_box.setLayout(vbox3)
         self.vbox.addWidget(self.monitor_box)
@@ -199,37 +231,60 @@ class Dashboard(QWidget):
         self.conf_helper = ConfigHelper()
         self.conf_helper.show()
 
+    def get_confirmation_dialog(self):
+        if self.confirm_dialog_closed:
+            self.confirm_dialog = ConfirmationDialog(self)
+            self.confirm_dialog.show()
+            self.confirm_dialog_closed = False
+
+    def on_microsleep_confirm(self):
+        self.microsleep_count += 1
+        self.confirm_dialog.close()
+        self.confirm_dialog_closed = True
+        print("Microsleep count is now", self.microsleep_count)
+
+    def on_noconfirm(self):
+        self.confirm_dialog.close()
+        self.confirm_dialog_closed = True
+        print(self.confirm_dialog)
+
 app = QApplication(sys.argv)
 window = Dashboard()
+
+
 
 
 def main():
     start_time = datetime.datetime.now()
     ringing = False
     prev_ringing = False
+    waking = False
     wakeups = 0
     w = Waker(window.alarm_dir, window.volume_max_command, window.play_command)
 
-    while 1:
-        if not window.schedule.isAsleep():
-            diff = datetime.datetime.now() - monitor.la
-            if diff >= window.max_inactivity:
-                # Label colour change
-                window.timer_label.setStyleSheet("color: #fff;" +
-                        "background-color: #f00")
-                # Alarm playing
-                prev_ringing = ringing
-                ringing = 1
-                w.wakeup()
-                if(prev_ringing != ringing):
-                    wakeups += 1
+    while not window.schedule.isAsleep():
+        diff = datetime.datetime.now() - monitor.la
+        if diff >= window.max_inactivity:
+            # Label colour change
+            window.timer_label.setStyleSheet("color: #fff;" +
+                    "background-color: #f00")
+            # Alarm playing
+            prev_ringing = ringing
+            ringing = 1
+            w.wakeup()
+            if(prev_ringing != ringing):
+                wakeups += 1
+                waking = True
 
-            if diff < window.max_inactivity:
-                prev_ringing = ringing
-                ringing = 0
-                window.timer_label.setStyleSheet("")
-                w.exit()
-        window.wakeups_label.setText(str(wakeups) + " wakeups in this session since " + str(start_time)[:19])
+        if diff < window.max_inactivity:
+            if(waking):
+                window.get_confirmation_dialog();
+                waking = False
+            prev_ringing = ringing
+            ringing = 0
+            window.timer_label.setStyleSheet("")
+            w.exit()
+        window.wakeups_label.setText(str(window.microsleep_count) + " microsleeps in this session since " + str(start_time)[5:19])
         time.sleep(1)
 
 
