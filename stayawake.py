@@ -30,35 +30,12 @@ verbose = options.parse_args().verbose
 path = ''
 
 
-class ConfirmationDialog(QWidget):
-    def __init__(self, parent=None):
-        super(ConfirmationDialog, self).__init__(parent)
-        self.setWindowTitle('Microsleep Confirmation')
-        label = QLabel("Was that an actual microsleep?")
-        self.parent = parent
-        quit = QAction("Quit", self)
-        quit.triggered.connect(self.close)
-
-        yes_button = QPushButton("Yes")
-        yes_button.clicked.connect(parent.on_microsleep_confirm)
-        no_button = QPushButton("No")
-        no_button.clicked.connect(parent.on_noconfirm)
-        self.vbox = QVBoxLayout()
-        self.setLayout(self.vbox)
-        self.vbox.addWidget(label)
-        self.vbox.addWidget(yes_button)
-        self.vbox.addWidget(no_button)
-        self.show()
-
-    def closeEvent(self, event):
-        self.parent.confirm_dialog_closed = True
-        event.accept()
-
 
 
 
 
 class Dashboard(QWidget):
+    wake = pyqtSignal()
     def __init__(self):
         super().__init__()
         self.setWindowTitle('StayAwake')
@@ -66,8 +43,8 @@ class Dashboard(QWidget):
         version = QLabel("Version: 0.5.1")
         title.setStyleSheet("font: 30pt")
 
+        self.wake.connect(self.create_confirmation_dialog)
         self.microsleep_count = 0
-        self.confirm_dialog_closed = True
 
         self.path = ''
         pathwin32 = os.path.expandvars('%USERPROFILE%\AppData\Roaming\stayawake\stayawake.conf')
@@ -231,27 +208,18 @@ class Dashboard(QWidget):
         self.conf_helper = ConfigHelper()
         self.conf_helper.show()
 
+    def create_confirmation_dialog(self):
+        val = QMessageBox.question(self, 'Confirm Microsleep', "Was that an actual microsleep?", QMessageBox.Yes | QMessageBox.No)
+        if val == QMessageBox.Yes:
+            self.microsleep_count += 1
+        if val == QMessageBox.No:
+            pass
+
     def get_confirmation_dialog(self):
-        if self.confirm_dialog_closed:
-            self.confirm_dialog = ConfirmationDialog(self)
-            self.confirm_dialog.show()
-            self.confirm_dialog_closed = False
-
-    def on_microsleep_confirm(self):
-        self.microsleep_count += 1
-        self.confirm_dialog.close()
-        self.confirm_dialog_closed = True
-        print("Microsleep count is now", self.microsleep_count)
-
-    def on_noconfirm(self):
-        self.confirm_dialog.close()
-        self.confirm_dialog_closed = True
-        print(self.confirm_dialog)
+        self.wake.emit()
 
 app = QApplication(sys.argv)
 window = Dashboard()
-
-
 
 
 def main():
